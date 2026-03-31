@@ -17,7 +17,7 @@
       "type": "application",
       "root": "src/user-service",
       "entryFile": "main",
-      "sourceRoot": "src/user-service/src",
+      "sourceRoot": "src",
       "compilerOptions": {
         "deleteOutDir": true,
         "outputPath": "dist/user-service"
