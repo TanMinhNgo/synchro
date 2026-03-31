@@ -13,7 +13,10 @@ async function bootstrap() {
 
   const corsOriginRaw = process.env.CORS_ORIGIN;
   const corsOrigins = corsOriginRaw
-    ? corsOriginRaw.split(',').map((s) => s.trim()).filter(Boolean)
+    ? corsOriginRaw
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean)
     : ['http://localhost:3000'];
 
   app.enableCors({
@@ -33,10 +36,13 @@ async function bootstrap() {
     .setTitle('Synchro API')
     .setDescription('Synchro backend API')
     .setVersion('0.1.0')
+    .addBearerAuth()
     .build();
   const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('docs', app, swaggerDocument);
+  SwaggerModule.setup('api-docs', app, swaggerDocument);
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 3000, () => {
+    console.log(`Server is running on: http://localhost:${process.env.PORT ?? 3000}/api-docs`);
+  });
 }
 bootstrap();
