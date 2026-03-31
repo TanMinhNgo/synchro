@@ -8,14 +8,15 @@ import { AppService } from './app.service';
 import { APP_FILTER } from '@nestjs/core';
 import { SentryGlobalFilter } from '@sentry/nestjs/setup';
 import { AuthModule } from './modules/auth/auth.module';
-import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
-        NODE_ENV: Joi.string().valid('development', 'test', 'production').default('development'),
+        NODE_ENV: Joi.string()
+          .valid('development', 'test', 'production')
+          .default('development'),
         PORT: Joi.number().port().default(3000),
         MONGODB_URI: Joi.string()
           .pattern(/^mongodb(\+srv)?:\/\//)
@@ -31,7 +32,7 @@ import { UsersModule } from './modules/users/users.module';
         SENTRY_ENVIRONMENT: Joi.string().optional(),
         SENTRY_TRACES_SAMPLE_RATE: Joi.number().min(0).max(1).optional(),
 
-        JWT_ACCESS_SECRET: Joi.string().min(16).required(),
+        JWT_ACCESS_SECRET: Joi.string().required(),
         JWT_ACCESS_TTL: Joi.string().optional(),
         REFRESH_TOKEN_TTL_DAYS: Joi.number().min(1).max(365).optional(),
         REFRESH_COOKIE_NAME: Joi.string().optional(),
@@ -51,13 +52,15 @@ import { UsersModule } from './modules/users/users.module';
       }),
     }),
 
-    UsersModule,
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService, {
-    provide: APP_FILTER,
-    useClass: SentryGlobalFilter,
-  }],
+  providers: [
+    AppService,
+    {
+      provide: APP_FILTER,
+      useClass: SentryGlobalFilter,
+    },
+  ],
 })
 export class AppModule {}

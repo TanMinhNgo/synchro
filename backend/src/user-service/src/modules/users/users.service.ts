@@ -5,7 +5,9 @@ import { User, UserDocument } from './schemas/user.schema';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private readonly userModel: Model<UserDocument>) {}
+  constructor(
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+  ) {}
 
   findById(userId: string) {
     return this.userModel.findById(userId).exec();
@@ -19,7 +21,11 @@ export class UsersService {
     return this.userModel.findOne({ 'providers.google.id': googleId }).exec();
   }
 
-  async createLocalUser(params: { email: string; name: string; passwordHash: string }) {
+  async createLocalUser(params: {
+    email: string;
+    name: string;
+    passwordHash: string;
+  }) {
     const doc = await this.userModel.create({
       email: params.email.toLowerCase().trim(),
       name: params.name.trim(),
