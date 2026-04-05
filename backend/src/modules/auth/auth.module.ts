@@ -32,7 +32,9 @@ function parseExpiresIn(
         useFactory: (config: ConfigService) => ({
           transport: Transport.NATS,
           options: {
-            servers: [config.get<string>('NATS_URL') ?? 'nats://localhost:4222'],
+            servers: [
+              config.get<string>('NATS_URL') ?? 'nats://localhost:4222',
+            ],
           },
         }),
       },

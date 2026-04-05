@@ -41,19 +41,25 @@ export class UsersMessageController {
   }
 
   @MessagePattern(userServiceSubjects.findByGoogleId)
-  async findByGoogleId(@Payload() payload: FindByGoogleIdReq): Promise<FindUserRes> {
+  async findByGoogleId(
+    @Payload() payload: FindByGoogleIdReq,
+  ): Promise<FindUserRes> {
     const user = await this.users.findByGoogleId(payload.googleId);
     return { user: user ? toRemoteUser(user) : null };
   }
 
   @MessagePattern(userServiceSubjects.createLocalUser)
-  async createLocalUser(@Payload() payload: CreateLocalUserReq): Promise<CreateUserRes> {
+  async createLocalUser(
+    @Payload() payload: CreateLocalUserReq,
+  ): Promise<CreateUserRes> {
     const user = await this.users.createLocalUser(payload);
     return { user: toRemoteUser(user) };
   }
 
   @MessagePattern(userServiceSubjects.createGoogleUser)
-  async createGoogleUser(@Payload() payload: CreateGoogleUserReq): Promise<CreateUserRes> {
+  async createGoogleUser(
+    @Payload() payload: CreateGoogleUserReq,
+  ): Promise<CreateUserRes> {
     const user = await this.users.createGoogleUser(payload);
     return { user: toRemoteUser(user) };
   }

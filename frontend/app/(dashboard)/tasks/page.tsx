@@ -21,7 +21,7 @@ export default function MyTasksPage() {
                 </div>
 
                 {/* Fake Timeline Calendar */}
-                <div className="relative h-[250px] shrink-0 w-full border-t border-b overflow-hidden flex flex-col bg-white">
+                <div className="relative h-63 shrink-0 w-full border-t border-b overflow-hidden flex flex-col bg-white">
                     {/* Header Dates */}
                     <div className="grid grid-cols-8 w-full text-center text-[13px] font-medium text-muted-foreground mt-4 mb-2 z-10">
                         <span>11 Feb</span>
@@ -69,10 +69,10 @@ export default function MyTasksPage() {
                             <div className="border-l border-black/5 relative">
                                 {/* Solid divider + handle inside the 14 Feb column center */}
                                 <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-[1.5px] bg-foreground z-10">
-                                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[4px] border-r-[4px] border-t-[5px] border-l-transparent border-r-transparent border-t-foreground" />
-                                    <div className="absolute top-[62px] left-1/2 -translate-x-1/2 w-2 h-3.5 bg-white border border-foreground rounded-[2px] flex flex-col justify-center items-center gap-[2px] shadow-sm cursor-pointer">
-                                        <div className="w-[3px] h-px bg-foreground/60" />
-                                        <div className="w-[3px] h-px bg-foreground/60" />
+                                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-[5px] border-l-transparent border-r-transparent border-t-foreground" />
+                                    <div className="absolute top-15.5 left-1/2 -translate-x-1/2 w-2 h-3.5 bg-white border border-foreground rounded-xs flex flex-col justify-center items-center gap-0.5 shadow-sm cursor-pointer">
+                                        <div className="w-0.75 h-px bg-foreground/60" />
+                                        <div className="w-0.75 h-px bg-foreground/60" />
                                     </div>
                                 </div>
 

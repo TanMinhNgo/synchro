@@ -22,6 +22,36 @@
         "deleteOutDir": true,
         "outputPath": "dist/user-service"
       }
+    },
+    "project-service": {
+      "type": "application",
+      "root": "src/project-service",
+      "entryFile": "main",
+      "sourceRoot": "src",
+      "compilerOptions": {
+        "deleteOutDir": true,
+        "outputPath": "dist/project-service"
+      }
+    },
+    "task-service": {
+      "type": "application",
+      "root": "src/task-service",
+      "entryFile": "main",
+      "sourceRoot": "src",
+      "compilerOptions": {
+        "deleteOutDir": true,
+        "outputPath": "dist/task-service"
+      }
+    },
+    "notification-service": {
+      "type": "application",
+      "root": "src/notification-service",
+      "entryFile": "main",
+      "sourceRoot": "src",
+      "compilerOptions": {
+        "deleteOutDir": true,
+        "outputPath": "dist/notification-service"
+      }
     }
   },
   "compilerOptions": {

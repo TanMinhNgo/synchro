@@ -8,6 +8,9 @@ import { AppService } from './app.service';
 import { APP_FILTER } from '@nestjs/core';
 import { SentryGlobalFilter } from '@sentry/nestjs/setup';
 import { AuthModule } from './modules/auth/auth.module';
+import { ProjectModule } from './modules/project/project.module';
+import { TaskModule } from './modules/task/task.module';
+import { NotificationModule } from './modules/notification/notification.module';
 
 @Module({
   imports: [
@@ -53,6 +56,9 @@ import { AuthModule } from './modules/auth/auth.module';
     }),
 
     AuthModule,
+    ProjectModule,
+    TaskModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [
