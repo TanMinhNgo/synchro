@@ -1,4 +1,4 @@
-import { BadGatewayException, Inject, Injectable } from '@nestjs/common';
+import { BadGatewayException, Inject, Injectable, Logger } from '@nestjs/common';
 import type { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom, timeout } from 'rxjs';
 import type { CreateBoardDto } from '@/contracts/project/dto/create-board.dto';
@@ -14,6 +14,8 @@ import {
 
 @Injectable()
 export class ProjectServiceClient {
+  private readonly logger = new Logger(ProjectServiceClient.name);
+
   constructor(
     @Inject(PROJECT_SERVICE_NATS_CLIENT) private readonly client: ClientProxy,
   ) {}
@@ -23,7 +25,9 @@ export class ProjectServiceClient {
       return await firstValueFrom(
         this.client.send<Res, Req>(subject, payload).pipe(timeout(5000)),
       );
-    } catch {
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.logger.error(`NATS request failed subject=${subject} error=${msg}`);
       throw new BadGatewayException('project-service (NATS) request failed');
     }
   }

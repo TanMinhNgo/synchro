@@ -1,6 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsArray,
+  IsDateString,
   IsEnum,
   IsInt,
   IsOptional,
@@ -46,6 +47,14 @@ export class UpdateTaskDto {
   @IsString()
   @MaxLength(5000)
   description?: string;
+
+  @ApiPropertyOptional({
+    example: '2026-04-07',
+    description: 'Task deadline (ISO 8601 date or datetime)',
+  })
+  @IsOptional()
+  @IsDateString()
+  dueDate?: string;
 
   @ApiPropertyOptional({ example: '65f0c0d2e2d3d4f5a6b7c8d9' })
   @IsOptional()

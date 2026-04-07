@@ -35,6 +35,7 @@ export class TaskService {
       columnKey: dto.columnKey,
       title: dto.title,
       description: dto.description,
+      ...(dto.dueDate !== undefined ? { dueDate: new Date(dto.dueDate) } : {}),
       createdBy,
       assigneeId: dto.assigneeId,
       priority: dto.priority,
@@ -55,6 +56,7 @@ export class TaskService {
     const patch: any = {
       ...(dto.title !== undefined ? { title: dto.title } : {}),
       ...(dto.description !== undefined ? { description: dto.description } : {}),
+      ...(dto.dueDate !== undefined ? { dueDate: new Date(dto.dueDate) } : {}),
       ...(dto.assigneeId !== undefined ? { assigneeId: dto.assigneeId } : {}),
       ...(dto.priority !== undefined ? { priority: dto.priority } : {}),
       ...(dto.columnKey !== undefined ? { columnKey: dto.columnKey } : {}),

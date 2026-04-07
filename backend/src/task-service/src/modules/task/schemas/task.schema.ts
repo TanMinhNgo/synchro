@@ -26,6 +26,9 @@ export class Task {
   @Prop({ trim: true, maxlength: 5000 })
   description?: string;
 
+  @Prop({ index: true })
+  dueDate?: Date;
+
   @Prop({ required: true, index: true })
   createdBy!: string;
 

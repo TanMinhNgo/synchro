@@ -11,9 +11,20 @@ interface BoardColumnProps {
   iconBgColor?: string;
   titleColor?: string;
   children?: React.ReactNode;
+  onAdd?: () => void;
+  onMenu?: () => void;
 }
 
-export function BoardColumn({ title, count, icon, iconBgColor = 'bg-muted', titleColor = 'text-foreground', children }: BoardColumnProps) {
+export function BoardColumn({
+  title,
+  count,
+  icon,
+  iconBgColor = 'bg-muted',
+  titleColor = 'text-foreground',
+  children,
+  onAdd,
+  onMenu,
+}: BoardColumnProps) {
   return (
     <div className="flex h-full flex-col gap-4 rounded-xl bg-muted/30 p-2 min-w-0">
       <div className="flex items-center justify-between px-2 pt-2">
@@ -27,10 +38,24 @@ export function BoardColumn({ title, count, icon, iconBgColor = 'bg-muted', titl
           <span className="text-sm font-medium text-muted-foreground ml-1">{count}</span>
         </div>
         <div className="flex items-center">
-          <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-foreground">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6 text-muted-foreground hover:text-foreground"
+            onClick={onMenu}
+            disabled={!onMenu}
+          >
             <MoreHorizontal className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-foreground ml-1">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6 text-muted-foreground hover:text-foreground ml-1"
+            onClick={onAdd}
+            disabled={!onAdd}
+          >
             <Plus className="h-4 w-4" />
           </Button>
         </div>

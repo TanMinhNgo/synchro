@@ -1,5 +1,6 @@
 export { LoginForm } from './ui/LoginForm';
 export { RegisterForm } from './ui/RegisterForm';
+export { AuthGuard } from './ui/AuthGuard';
 export { useAuthStore } from './model/auth.store';
 export { authApi } from './api/auth.api';
 export { useLogin } from './hooks/useLogin';

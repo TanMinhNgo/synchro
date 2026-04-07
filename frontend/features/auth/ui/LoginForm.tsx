@@ -11,11 +11,25 @@ import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
 export function LoginForm() {
   const loginMutation = useLogin();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const nextPath = React.useMemo(() => {
+    const next = searchParams.get('next');
+    return next && next.startsWith('/') ? next : '/dashboard';
+  }, [searchParams]);
+
+  React.useEffect(() => {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      router.replace(nextPath);
+    }
+  }, [router, nextPath]);
 
   const {
     register,
@@ -29,7 +43,7 @@ export function LoginForm() {
     loginMutation.mutate(data, {
       onSuccess: () => {
         toast.success('Logged in successfully');
-        router.push('/dashboard');
+        router.push(nextPath);
       },
       onError: (error) => {
         toast.error(error instanceof Error ? error.message : 'Login failed');

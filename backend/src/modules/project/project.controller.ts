@@ -17,6 +17,7 @@ import {
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
 import type { CurrentUserClaims } from '@/common/decorators/current-user.decorator';
 import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
+import { UserServiceClient } from '@/modules/auth/user-service.client';
 import { CreateBoardDto } from '@/contracts/project/dto/create-board.dto';
 import { CreateColumnDto } from '@/contracts/project/dto/create-column.dto';
 import { CreateLabelDto } from '@/contracts/project/dto/create-label.dto';
@@ -30,7 +31,10 @@ import { ProjectServiceClient } from './project-service.client';
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 export class ProjectController {
-  constructor(private readonly projects: ProjectServiceClient) {}
+  constructor(
+    private readonly projects: ProjectServiceClient,
+    private readonly users: UserServiceClient,
+  ) {}
 
   @Get('projects')
   @ApiOperation({ summary: 'List projects visible to current user' })
@@ -56,6 +60,38 @@ export class ProjectController {
     return this.projects
       .getProject((user as CurrentUserClaims).sub, projectId)
       .then((r) => r.project);
+  }
+
+  @Get('projects/:projectId/members')
+  @ApiOperation({ summary: 'List project member profiles (owner + members)' })
+  @ApiOkResponse({ description: 'Project member profiles' })
+  async listProjectMembers(
+    @CurrentUser() user: any,
+    @Param('projectId') projectId: string,
+  ) {
+    const res = await this.projects.getProject(
+      (user as CurrentUserClaims).sub,
+      projectId,
+    );
+    const project = res.project as { ownerId?: unknown; memberIds?: unknown };
+    const ownerId = typeof project.ownerId === 'string' ? project.ownerId : '';
+    const memberIds = Array.isArray(project.memberIds)
+      ? project.memberIds.filter((id): id is string => typeof id === 'string')
+      : [];
+
+    const ids = Array.from(new Set([ownerId, ...memberIds])).filter(
+      (id): id is string => typeof id === 'string' && id.length > 0,
+    );
+
+    const users = await Promise.all(ids.map((id) => this.users.findById(id)));
+    return users
+      .filter((u): u is NonNullable<typeof u> => Boolean(u))
+      .map((u) => ({
+        id: u.id,
+        email: u.email,
+        name: u.name,
+        avatarUrl: u.avatarUrl,
+      }));
   }
 
   @Patch('projects/:projectId')

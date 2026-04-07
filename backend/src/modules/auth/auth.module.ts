@@ -58,5 +58,6 @@ function parseExpiresIn(
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, GoogleStrategy, UserServiceClient],
+  exports: [UserServiceClient],
 })
 export class AuthModule {}
