@@ -6,4 +6,5 @@ export const userServiceSubjects = {
   findByGoogleId: 'users.findByGoogleId',
   createLocalUser: 'users.createLocalUser',
   createGoogleUser: 'users.createGoogleUser',
+  updateProfile: 'users.updateProfile',
 } as const;

@@ -74,7 +74,7 @@ export function RegisterForm() {
             />
             {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
           </div>
-          <div className="space-y-2">
+          <div className="space-y-2 mb-4">
             <Label htmlFor="confirmPassword">Confirm Password</Label>
             <Input
               id="confirmPassword"

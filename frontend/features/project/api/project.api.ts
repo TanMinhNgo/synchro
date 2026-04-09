@@ -117,11 +117,15 @@ export const projectApi = {
       .map((u) => normalizeId(u as Record<string, unknown> & MongoIdLike))
       .map((u) => ({
         id: u.id,
-        email: String((u as any).email ?? ''),
-        name: String((u as any).name ?? ''),
+        email: String((u).email ?? ''),
+        name: String((u).name ?? ''),
         avatarUrl:
-          typeof (u as any).avatarUrl === 'string' ? (u as any).avatarUrl : undefined,
+          typeof (u).avatarUrl === 'string' ? (u).avatarUrl : undefined,
       }))
       .filter((u) => u.id && u.name && u.email);
+  },
+
+  async inviteMember(projectId: string, email: string): Promise<void> {
+    await apiClient.post(`/projects/${projectId}/invite`, { email });
   },
 };

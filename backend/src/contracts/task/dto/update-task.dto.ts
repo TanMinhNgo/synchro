@@ -6,6 +6,7 @@ import {
   IsInt,
   IsOptional,
   IsString,
+  IsUrl,
   Max,
   MaxLength,
   Min,
@@ -15,6 +16,21 @@ import {
 import { Type } from 'class-transformer';
 import { ProjectColumnKey } from '@/contracts/project/project.enums';
 import { TaskPriority } from '@/contracts/task/task.enums';
+
+class TaskAttachmentDto {
+  @ApiPropertyOptional({ example: 'https://docs.google.com/document/d/...' })
+  @IsOptional()
+  @IsString()
+  @IsUrl({ require_tld: false })
+  @MaxLength(2000)
+  url?: string;
+
+  @ApiPropertyOptional({ example: 'Spec / Requirements' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  title?: string;
+}
 
 class UpdateSubtaskDto {
   @ApiPropertyOptional({ example: 'subtask-id' })
@@ -61,6 +77,15 @@ export class UpdateTaskDto {
   @IsString()
   assigneeId?: string;
 
+  @ApiPropertyOptional({
+    example: ['65f0c0d2e2d3d4f5a6b7c8d9', '65f0c0d2e2d3d4f5a6b7c8d0'],
+    description: 'Multiple assignees (overrides assigneeId when provided)',
+  })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  assigneeIds?: string[];
+
   @ApiPropertyOptional({ enum: TaskPriority, example: TaskPriority.high })
   @IsOptional()
   @IsEnum(TaskPriority)
@@ -86,6 +111,16 @@ export class UpdateTaskDto {
   @ValidateNested({ each: true })
   @Type(() => UpdateSubtaskDto)
   subtasks?: UpdateSubtaskDto[];
+
+  @ApiPropertyOptional({
+    type: [TaskAttachmentDto],
+    description: 'Task attachments as links',
+  })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => TaskAttachmentDto)
+  attachments?: TaskAttachmentDto[];
 
   @ApiPropertyOptional({ example: 10 })
   @IsOptional()

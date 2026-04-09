@@ -4,6 +4,9 @@ import { ProjectStatus } from '@/contracts/project/project.enums';
 
 @Schema({ timestamps: true })
 export class Project {
+  @Prop({ trim: true, maxlength: 160, index: true, unique: true, sparse: true })
+  slug?: string;
+
   @Prop({ required: true, trim: true, maxlength: 120 })
   name!: string;
 

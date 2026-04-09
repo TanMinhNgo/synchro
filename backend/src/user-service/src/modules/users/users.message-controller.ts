@@ -11,6 +11,8 @@ import type {
   FindByIdReq,
   FindUserRes,
   RemoteUser,
+  UpdateProfileReq,
+  UpdateUserRes,
 } from './users.messages';
 
 function toRemoteUser(doc: any): RemoteUser {
@@ -62,5 +64,16 @@ export class UsersMessageController {
   ): Promise<CreateUserRes> {
     const user = await this.users.createGoogleUser(payload);
     return { user: toRemoteUser(user) };
+  }
+
+  @MessagePattern(userServiceSubjects.updateProfile)
+  async updateProfile(
+    @Payload() payload: UpdateProfileReq,
+  ): Promise<UpdateUserRes> {
+    const user = await this.users.updateProfile(payload.userId, {
+      name: payload.name,
+      avatarUrl: payload.avatarUrl,
+    });
+    return { user: user ? toRemoteUser(user) : null };
   }
 }

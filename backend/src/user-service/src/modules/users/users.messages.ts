@@ -4,6 +4,7 @@ export const userServiceSubjects = {
   findByGoogleId: 'users.findByGoogleId',
   createLocalUser: 'users.createLocalUser',
   createGoogleUser: 'users.createGoogleUser',
+  updateProfile: 'users.updateProfile',
 } as const;
 
 export type RemoteUser = {
@@ -32,5 +33,12 @@ export type CreateGoogleUserReq = {
   avatarUrl?: string;
 };
 
+export type UpdateProfileReq = {
+  userId: string;
+  name?: string;
+  avatarUrl?: string;
+};
+
 export type FindUserRes = { user: RemoteUser | null };
 export type CreateUserRes = { user: RemoteUser };
+export type UpdateUserRes = { user: RemoteUser | null };

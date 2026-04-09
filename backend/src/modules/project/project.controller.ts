@@ -1,7 +1,9 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   Param,
   Patch,
@@ -104,6 +106,40 @@ export class ProjectController {
     return this.projects
       .updateProject((user as CurrentUserClaims).sub, projectId, dto)
       .then((r) => r.project);
+  }
+
+  @Post('projects/:projectId/invite')
+  @ApiOperation({ summary: 'Invite a member to project by email (owner only)' })
+  @ApiOkResponse({ description: 'Invitation applied (membership updated)' })
+  async inviteMember(
+    @CurrentUser() user: any,
+    @Param('projectId') projectId: string,
+    @Body() body: { email?: string },
+  ) {
+    const userId = (user as CurrentUserClaims).sub;
+    const email = typeof body?.email === 'string' ? body.email.trim() : '';
+    if (!email) throw new BadRequestException('Email is required');
+
+    const res = await this.projects.getProject(userId, projectId);
+    const project = res.project as { ownerId?: unknown; memberIds?: unknown };
+    if (project.ownerId !== userId)
+      throw new ForbiddenException('Only owner can invite');
+
+    const target = await this.users.findByEmail(email);
+    if (!target) throw new BadRequestException('User not found');
+
+    const memberIdsRaw = project.memberIds;
+    const memberIds = Array.isArray(memberIdsRaw)
+      ? memberIdsRaw.filter((id): id is string => typeof id === 'string')
+      : [];
+
+    const nextMemberIds = Array.from(new Set([...memberIds, target.id]));
+
+    await this.projects.updateProject(userId, projectId, {
+      memberIds: nextMemberIds,
+    });
+
+    return { ok: true };
   }
 
   @Delete('projects/:projectId')

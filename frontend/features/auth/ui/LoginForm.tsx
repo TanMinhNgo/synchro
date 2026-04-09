@@ -69,7 +69,7 @@ export function LoginForm() {
             />
             {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
           </div>
-          <div className="space-y-2">
+          <div className="space-y-2 mb-4">
             <Label htmlFor="password">Password</Label>
             <Input
               id="password"

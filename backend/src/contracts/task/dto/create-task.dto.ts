@@ -6,6 +6,7 @@ import {
   IsInt,
   IsOptional,
   IsString,
+  IsUrl,
   Max,
   MaxLength,
   Min,
@@ -15,6 +16,20 @@ import {
 import { Type } from 'class-transformer';
 import { ProjectColumnKey } from '@/contracts/project/project.enums';
 import { TaskPriority } from '@/contracts/task/task.enums';
+
+class TaskAttachmentDto {
+  @ApiProperty({ example: 'https://docs.google.com/document/d/...' })
+  @IsString()
+  @IsUrl({ require_tld: false })
+  @MaxLength(2000)
+  url!: string;
+
+  @ApiPropertyOptional({ example: 'Spec / Requirements' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  title?: string;
+}
 
 class CreateSubtaskDto {
   @ApiProperty({ example: 'Write unit tests' })
@@ -62,6 +77,15 @@ export class CreateTaskDto {
   @IsString()
   assigneeId?: string;
 
+  @ApiPropertyOptional({
+    example: ['65f0c0d2e2d3d4f5a6b7c8d9', '65f0c0d2e2d3d4f5a6b7c8d0'],
+    description: 'Multiple assignees (overrides assigneeId when provided)',
+  })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  assigneeIds?: string[];
+
   @ApiProperty({ enum: TaskPriority, example: TaskPriority.medium })
   @IsEnum(TaskPriority)
   priority!: TaskPriority;
@@ -78,6 +102,16 @@ export class CreateTaskDto {
   @ValidateNested({ each: true })
   @Type(() => CreateSubtaskDto)
   subtasks?: CreateSubtaskDto[];
+
+  @ApiPropertyOptional({
+    type: [TaskAttachmentDto],
+    description: 'Task attachments as links',
+  })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => TaskAttachmentDto)
+  attachments?: TaskAttachmentDto[];
 
   @ApiPropertyOptional({ example: 0 })
   @IsOptional()

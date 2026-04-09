@@ -1,0 +1,15 @@
+'use client';
+
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { notificationApi } from '../api/notification.api';
+
+export function useMarkAllNotificationsRead() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => notificationApi.markAllRead(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    },
+  });
+}

@@ -10,11 +10,21 @@ export class TaskRepository {
   }
 
   findTasks(
-    filter: Partial<
-      Pick<Task, 'projectId' | 'boardId' | 'columnKey' | 'assigneeId'>
-    >,
+    filter: Partial<Pick<Task, 'projectId' | 'boardId' | 'columnKey'>> & {
+      assigneeId?: string;
+    },
   ) {
-    return this.taskModel.find(filter).sort({ order: 1, createdAt: -1 }).lean();
+    const { assigneeId, ...rest } = filter;
+    const mongoFilter: Record<string, unknown> = { ...rest };
+
+    if (assigneeId) {
+      mongoFilter.$or = [{ assigneeId }, { assigneeIds: assigneeId }];
+    }
+
+    return this.taskModel
+      .find(mongoFilter)
+      .sort({ order: 1, createdAt: -1 })
+      .lean();
   }
 
   findTaskById(taskId: string) {

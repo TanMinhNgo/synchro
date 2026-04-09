@@ -2,11 +2,13 @@
 
 import * as React from 'react';
 import { useCurrentUser, useLogout } from '@/features/auth';
+import { useVideoCallParticipants } from '@/features/chat';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Input } from '@/components/ui/input';
 import { Search, Share2, MoreHorizontal, ChevronRight, UserPlus } from 'lucide-react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import { VoiceChat } from '@/components/ui/chat-bubble';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,18 +17,54 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { useInviteProjectMember } from '@/features/project/hooks/use-invite-project-member';
+import { useProject } from '@/features/project/hooks/use-project';
 
 export function Navbar() {
   const { data: user } = useCurrentUser();
   const logoutMutation = useLogout();
   const pathname = usePathname();
+  const router = useRouter();
+
+  const callId = 'general';
+  const { participantsQuery } = useVideoCallParticipants(Boolean(user), callId);
+  const callUsers = participantsQuery.data ?? [];
+
+  const [searchValue, setSearchValue] = React.useState('');
+  const [inviteOpen, setInviteOpen] = React.useState(false);
+  const [inviteEmail, setInviteEmail] = React.useState('');
+
+  const pathSegments = React.useMemo(
+    () => pathname.split('/').filter(Boolean),
+    [pathname],
+  );
+
+  const activeProjectIdOrSlug =
+    pathSegments[0] === 'projects' && typeof pathSegments[1] === 'string'
+      ? pathSegments[1]
+      : null;
+  const activeProjectId = activeProjectIdOrSlug ?? '';
+  const projectQuery = useProject(activeProjectId);
+  const isProjectOwner = Boolean(
+    user && projectQuery.data && projectQuery.data.ownerId === user.id,
+  );
+  const canInvite = Boolean(activeProjectIdOrSlug) && isProjectOwner;
+
+  const inviteMutation = useInviteProjectMember(activeProjectId);
 
   // Simple formatting for breadcrumb
   const pageName = pathname.split('/').pop()?.replace('-', ' ') || 'Dashboard';
   const formattedPageName = pageName.charAt(0).toUpperCase() + pageName.slice(1);
 
   return (
-    <header className="flex h-[72px] items-center justify-between border-b bg-background px-6 shrink-0">
+    <header className="flex h-18 items-center justify-between border-b bg-background px-6 shrink-0">
       <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
         <span>Synchro</span>
         <ChevronRight className="h-4 w-4" />
@@ -44,7 +82,14 @@ export function Navbar() {
           <Input 
             type="search" 
             placeholder="Search task..." 
-            className="w-full bg-muted/30 pl-9 rounded-full h-9 border-none text-sm focus-visible:ring-1" 
+            className="w-full bg-muted/30 pl-9 rounded-full h-9 border-none text-sm focus-visible:ring-1"
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key !== 'Enter') return;
+              const q = searchValue.trim();
+              router.push(q ? `/tasks?search=${encodeURIComponent(q)}` : '/tasks');
+            }}
           />
         </div>
 
@@ -55,23 +100,28 @@ export function Navbar() {
         <div className="flex items-center gap-3 border-l pl-4 ml-2">
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground font-medium">3 min ago</span>
-            <div className="flex -space-x-2">
-              <Avatar className="h-7 w-7 border-2 border-background">
-                <AvatarImage src="https://i.pravatar.cc/150?img=1" />
-              </Avatar>
-              <Avatar className="h-7 w-7 border-2 border-background">
-                <AvatarImage src="https://i.pravatar.cc/150?img=2" />
-              </Avatar>
-              <Avatar className="h-7 w-7 border-2 border-background">
-                <AvatarImage src="https://i.pravatar.cc/150?img=3" />
-              </Avatar>
-              <div className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-background bg-muted text-[10px] font-medium">
-                +2
-              </div>
-            </div>
+            <VoiceChat
+              users={callUsers}
+              onJoin={() => {
+                const url = `/chat/call?callId=${encodeURIComponent(callId)}`;
+                window.open(url, '_blank', 'noopener,noreferrer');
+              }}
+            />
           </div>
 
-          <Button className="h-9 rounded-xl font-medium px-4 gap-2">
+          <Button
+            className="h-9 rounded-xl font-medium px-4 gap-2"
+            disabled={!activeProjectIdOrSlug || projectQuery.isLoading || !isProjectOwner}
+            onClick={() => {
+              if (!activeProjectIdOrSlug) return;
+              if (projectQuery.isLoading) return;
+              if (!isProjectOwner) {
+                toast.error('Only the project owner can invite members.');
+                return;
+              }
+              setInviteOpen(true);
+            }}
+          >
             <UserPlus className="h-4 w-4" />
             Invite
           </Button>
@@ -103,6 +153,77 @@ export function Navbar() {
           </DropdownMenu>
         </div>
       </div>
+
+      <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Invite member</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-2">
+            <div className="text-sm text-muted-foreground">
+              Invite a teammate to this project by email.
+            </div>
+            <Input
+              type="email"
+              placeholder="name@company.com"
+              value={inviteEmail}
+              onChange={(e) => setInviteEmail(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key !== 'Enter') return;
+                const email = inviteEmail.trim();
+                if (!activeProjectIdOrSlug) return;
+                inviteMutation.mutate(
+                  { email },
+                  {
+                    onSuccess: () => {
+                      toast.success('Invitation sent');
+                      setInviteEmail('');
+                      setInviteOpen(false);
+                    },
+                    onError: (err) => {
+                      toast.error(err instanceof Error ? err.message : 'Invite failed');
+                    },
+                  },
+                );
+              }}
+            />
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setInviteOpen(false);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                const email = inviteEmail.trim();
+                if (!activeProjectIdOrSlug) return;
+                inviteMutation.mutate(
+                  { email },
+                  {
+                    onSuccess: () => {
+                      toast.success('Invitation sent');
+                      setInviteEmail('');
+                      setInviteOpen(false);
+                    },
+                    onError: (err) => {
+                      toast.error(err instanceof Error ? err.message : 'Invite failed');
+                    },
+                  },
+                );
+              }}
+              disabled={inviteMutation.isPending || inviteEmail.trim().length === 0}
+            >
+              {inviteMutation.isPending ? 'Inviting…' : 'Invite'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </header>
   );
 }

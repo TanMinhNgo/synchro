@@ -10,6 +10,11 @@ interface RefreshResponse {
   refreshToken?: string;
 }
 
+export type UpdateProfileInput = {
+  name?: string;
+  avatarUrl?: string;
+};
+
 export const authApi = {
   login: async (data: LoginAction): Promise<AuthResponse> => {
     const response = await apiClient.post('/auth/login', data);
@@ -33,6 +38,11 @@ export const authApi = {
 
   getCurrentUser: async (): Promise<User> => {
     const response = await apiClient.get('/auth/me');
+    return response.data.user;
+  },
+
+  updateProfile: async (input: UpdateProfileInput): Promise<User> => {
+    const response = await apiClient.patch('/auth/me', input);
     return response.data.user;
   },
 

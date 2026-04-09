@@ -4,7 +4,25 @@ import type { CreateTaskDto } from '@/contracts/task/dto/create-task.dto';
 import type { TransitionTaskDto } from '@/contracts/task/dto/transition-task.dto';
 import type { UpdateTaskDto } from '@/contracts/task/dto/update-task.dto';
 import type { Subtask } from './schemas/task.schema';
+import { ProjectColumnKey } from '@/contracts/project/project.enums';
 import { TaskRepository } from './task.repository';
+
+function canMarkDone(subtasks: Subtask[] | undefined): boolean {
+  const list = subtasks ?? [];
+  if (list.length === 0) return true;
+  return list.every((s) => Boolean(s.isDone));
+}
+
+function normalizeAssigneeIds(dto: {
+  assigneeIds?: unknown;
+  assigneeId?: unknown;
+}): string[] {
+  if (Array.isArray(dto.assigneeIds)) {
+    return dto.assigneeIds.filter((v): v is string => typeof v === 'string' && v.length > 0);
+  }
+  if (typeof dto.assigneeId === 'string' && dto.assigneeId) return [dto.assigneeId];
+  return [];
+}
 
 @Injectable()
 export class TaskService {
@@ -29,6 +47,11 @@ export class TaskService {
       isDone: Boolean(s.isDone),
     }));
 
+    const assigneeIds = normalizeAssigneeIds(dto);
+    const attachments = (dto.attachments ?? [])
+      .filter((a) => a && typeof a.url === 'string' && a.url.trim().length > 0)
+      .map((a) => ({ url: a.url.trim(), ...(a.title ? { title: a.title.trim() } : {}) }));
+
     const task = await this.repo.createTask({
       projectId,
       boardId: dto.boardId,
@@ -37,10 +60,12 @@ export class TaskService {
       description: dto.description,
       ...(dto.dueDate !== undefined ? { dueDate: new Date(dto.dueDate) } : {}),
       createdBy,
-      assigneeId: dto.assigneeId,
+      assigneeId: assigneeIds[0],
+      assigneeIds,
       priority: dto.priority,
       labelIds: dto.labelIds ?? [],
       subtasks,
+      attachments,
       order: dto.order ?? 0,
     });
     return task.toObject();
@@ -57,12 +82,26 @@ export class TaskService {
       ...(dto.title !== undefined ? { title: dto.title } : {}),
       ...(dto.description !== undefined ? { description: dto.description } : {}),
       ...(dto.dueDate !== undefined ? { dueDate: new Date(dto.dueDate) } : {}),
-      ...(dto.assigneeId !== undefined ? { assigneeId: dto.assigneeId } : {}),
       ...(dto.priority !== undefined ? { priority: dto.priority } : {}),
       ...(dto.columnKey !== undefined ? { columnKey: dto.columnKey } : {}),
       ...(dto.labelIds !== undefined ? { labelIds: dto.labelIds } : {}),
       ...(dto.order !== undefined ? { order: dto.order } : {}),
     };
+
+    if (dto.assigneeIds !== undefined) {
+      const assigneeIds = normalizeAssigneeIds(dto);
+      patch.assigneeIds = assigneeIds;
+      patch.assigneeId = assigneeIds.length > 0 ? assigneeIds[0] : null;
+    } else if (dto.assigneeId !== undefined) {
+      if (dto.assigneeId === null) {
+        patch.assigneeIds = [];
+        patch.assigneeId = null;
+      } else {
+        const assigneeIds = normalizeAssigneeIds(dto);
+        patch.assigneeIds = assigneeIds;
+        patch.assigneeId = assigneeIds.length > 0 ? assigneeIds[0] : null;
+      }
+    }
 
     if (dto.subtasks !== undefined) {
       const subtasks: Subtask[] = dto.subtasks.map((s) => ({
@@ -77,12 +116,48 @@ export class TaskService {
       patch.subtasks = subtasks;
     }
 
+    if (dto.attachments !== undefined) {
+      const attachments = (dto.attachments ?? [])
+        .filter((a) => a && typeof a.url === 'string' && a.url.trim().length > 0)
+        .map((a) => ({
+          url: a.url!.trim(),
+          ...(a.title ? { title: a.title.trim() } : {}),
+        }));
+      patch.attachments = attachments;
+    }
+
+    if (dto.columnKey === ProjectColumnKey.done) {
+      const current = await this.repo.findTaskById(taskId);
+      if (!current) throw new NotFoundException('Task not found');
+
+      const nextSubtasks: Subtask[] | undefined =
+        patch.subtasks !== undefined ? (patch.subtasks as Subtask[]) : (current as any).subtasks;
+
+      if (!canMarkDone(nextSubtasks)) {
+        throw new BadRequestException(
+          'Cannot mark task as completed until progress is 100% (all subtasks done).',
+        );
+      }
+    }
+
     const updated = await this.repo.updateTask(taskId, patch);
     if (!updated) throw new NotFoundException('Task not found');
     return updated;
   }
 
   async transitionTask(taskId: string, dto: TransitionTaskDto) {
+    if (dto.columnKey === ProjectColumnKey.done) {
+      const current = await this.repo.findTaskById(taskId);
+      if (!current) throw new NotFoundException('Task not found');
+      const subtasks: Subtask[] | undefined = (current as any).subtasks;
+
+      if (!canMarkDone(subtasks)) {
+        throw new BadRequestException(
+          'Cannot mark task as completed until progress is 100% (all subtasks done).',
+        );
+      }
+    }
+
     const updated = await this.repo.updateTask(taskId, { columnKey: dto.columnKey });
     if (!updated) throw new NotFoundException('Task not found');
     return updated;

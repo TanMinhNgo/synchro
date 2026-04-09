@@ -9,6 +9,7 @@ export type ProjectColumnKey = 'backlog' | 'in_progress' | 'in_review' | 'done';
 
 export type Project = {
   id: string;
+  slug?: string;
   name: string;
   description?: string;
   ownerId: string;

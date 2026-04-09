@@ -32,6 +32,16 @@ export class ProjectRepository {
     return this.projectModel.findById(projectId).lean();
   }
 
+  findProjectBySlug(slug: string) {
+    return this.projectModel.findOne({ slug }).lean();
+  }
+
+  setProjectSlugById(projectId: string, slug: string) {
+    return this.projectModel
+      .findByIdAndUpdate(projectId, { slug }, { new: true })
+      .lean();
+  }
+
   updateProject(projectId: string, patch: Partial<Project>) {
     return this.projectModel
       .findByIdAndUpdate(projectId, patch, { new: true })

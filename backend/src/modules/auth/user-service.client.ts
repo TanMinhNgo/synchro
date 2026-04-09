@@ -27,9 +27,15 @@ type CreateGoogleUserReq = {
   googleId: string;
   avatarUrl?: string;
 };
+type UpdateProfileReq = {
+  userId: string;
+  name?: string;
+  avatarUrl?: string;
+};
 
 type FindUserRes = { user: RemoteUser | null };
 type CreateUserRes = { user: RemoteUser };
+type UpdateUserRes = { user: RemoteUser | null };
 
 @Injectable()
 export class UserServiceClient {
@@ -84,6 +90,24 @@ export class UserServiceClient {
       userServiceSubjects.createGoogleUser,
       params,
     );
+    return res.user;
+  }
+
+  async updateProfile(
+    userId: string,
+    params: { name?: string; avatarUrl?: string },
+  ): Promise<RemoteUser> {
+    const res = await this.send<UpdateProfileReq, UpdateUserRes>(
+      userServiceSubjects.updateProfile,
+      {
+        userId,
+        name: params.name,
+        avatarUrl: params.avatarUrl,
+      },
+    );
+    if (!res.user) {
+      throw new BadGatewayException('User not found');
+    }
     return res.user;
   }
 }

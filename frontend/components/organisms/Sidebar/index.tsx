@@ -4,31 +4,28 @@ import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, CheckSquare, Inbox, PieChart, FolderOpen, UserCircle, Flag, HelpCircle, Plus, PanelLeftClose, MoreHorizontal, ListMinus } from 'lucide-react';
+import { LayoutDashboard, CheckSquare, Inbox, PieChart, FolderOpen, UserCircle, Flag, HelpCircle, Plus, PanelLeftClose, MoreHorizontal, ListMinus, MessagesSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useCurrentUser } from '@/features/auth';
+import { useFavoriteProjects } from '@/features/project/hooks/use-favorite-projects';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'My Task', href: '/tasks', icon: CheckSquare },
   { name: 'Inbox', href: '/inbox', icon: Inbox, count: 5 },
+  { name: 'Chat', href: '/chat', icon: MessagesSquare },
   { name: 'Reporting', href: '/reporting', icon: PieChart },
   { name: 'Portfolio', href: '/portfolio', icon: FolderOpen },
   { name: 'Accounts', href: '/accounts', icon: UserCircle },
   { name: 'Goals', href: '/goals', icon: Flag },
 ];
 
-const favourites = [
-  { name: 'ABC Projects - Dashboard', href: '/projects/1' },
-  { name: 'Kiara Projects - Website', href: '/projects/2' },
-  { name: 'Dribbble Shot', href: '/projects/3' },
-];
-
 export function Sidebar() {
   const pathname = usePathname();
   const { data: user } = useCurrentUser();
+  const { favorites } = useFavoriteProjects(3);
 
   return (
     <div className="flex h-full w-65 flex-col border-r bg-background shrink-0">
@@ -101,9 +98,9 @@ export function Sidebar() {
             </div>
           </div>
           <nav className="space-y-0.5">
-            {favourites.map((item) => (
+            {favorites.map((item) => (
               <Link
-                key={item.name}
+                key={item.projectId}
                 href={item.href}
                 className="flex items-center gap-3 rounded-lg px-2 py-2 text-sm text-muted-foreground hover:bg-secondary/50 hover:text-foreground transition-colors font-medium"
               >

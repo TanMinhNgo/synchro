@@ -8,6 +8,11 @@ export type Subtask = {
   isDone: boolean;
 };
 
+export type TaskAttachment = {
+  url: string;
+  title?: string;
+};
+
 export type CreateSubtaskInput = {
   title: string;
   isDone?: boolean;
@@ -25,10 +30,13 @@ export type CreateTaskInput = {
   title: string;
   description?: string;
   dueDate?: string;
+  /** @deprecated Prefer assigneeIds */
   assigneeId?: string;
+  assigneeIds?: string[];
   priority: TaskPriority;
   labelIds?: string[];
   subtasks?: CreateSubtaskInput[];
+  attachments?: TaskAttachment[];
   order?: number;
 };
 
@@ -36,11 +44,14 @@ export type UpdateTaskInput = {
   title?: string;
   description?: string;
   dueDate?: string;
+  /** @deprecated Prefer assigneeIds */
   assigneeId?: string | null;
+  assigneeIds?: string[];
   priority?: TaskPriority;
   columnKey?: ProjectColumnKey;
   labelIds?: string[];
   subtasks?: UpdateSubtaskInput[];
+  attachments?: TaskAttachment[];
   order?: number;
 };
 
@@ -57,10 +68,13 @@ export type Task = {
   description?: string;
   dueDate?: string;
   createdBy: string;
-  assigneeId?: string;
+  /** @deprecated Prefer assigneeIds */
+  assigneeId?: string | null;
+  assigneeIds?: string[];
   priority: TaskPriority;
   labelIds: string[];
   subtasks: Subtask[];
+  attachments?: TaskAttachment[];
   order: number;
   createdAt?: string;
   updatedAt?: string;

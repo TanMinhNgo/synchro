@@ -12,6 +12,42 @@ function normalizeId<T extends MongoIdLike & Record<string, unknown>>(
   return { ...obj, id: idValue };
 }
 
+function normalizeTask(obj: Record<string, unknown> & MongoIdLike): Task {
+  const withId = normalizeId(obj) as Record<string, unknown> & { id: string };
+
+  const legacyAssigneeId =
+    typeof withId.assigneeId === 'string' && withId.assigneeId ? withId.assigneeId : undefined;
+
+  const assigneeIds = Array.isArray(withId.assigneeIds)
+    ? (withId.assigneeIds.filter((v) => typeof v === 'string' && v.length > 0) as string[])
+    : legacyAssigneeId
+      ? [legacyAssigneeId]
+      : [];
+
+  const attachments = Array.isArray(withId.attachments)
+    ? (withId.attachments
+        .filter(
+          (a) =>
+            a &&
+            typeof a === 'object' &&
+            typeof (a as { url?: unknown }).url === 'string' &&
+            ((a as { url: string }).url ?? '').length > 0,
+        )
+        .map((a) => ({
+          url: String((a as { url: string }).url),
+          ...(typeof (a as { title?: unknown }).title === 'string' && (a as { title: string }).title
+            ? { title: String((a as { title: string }).title) }
+            : {}),
+        })) as Task['attachments'])
+    : [];
+
+  return {
+    ...(withId as unknown as Task),
+    assigneeIds,
+    attachments,
+  };
+}
+
 export const taskApi = {
   async listTasksByProject(params: {
     projectId: string;
@@ -29,29 +65,27 @@ export const taskApi = {
     });
 
     const items = Array.isArray(res.data) ? (res.data as Array<Record<string, unknown>>) : [];
-    return items.map((t) =>
-      normalizeId(t as Record<string, unknown> & MongoIdLike) as unknown as Task,
-    );
+    return items.map((t) => normalizeTask(t as Record<string, unknown> & MongoIdLike));
   },
 
   async createTask(projectId: string, input: CreateTaskInput): Promise<Task> {
     const res = await apiClient.post(`/projects/${projectId}/tasks`, input);
-    return normalizeId(res.data as Record<string, unknown> & MongoIdLike) as unknown as Task;
+    return normalizeTask(res.data as Record<string, unknown> & MongoIdLike);
   },
 
   async getTask(taskId: string): Promise<Task> {
     const res = await apiClient.get(`/tasks/${taskId}`);
-    return normalizeId(res.data as Record<string, unknown> & MongoIdLike) as unknown as Task;
+    return normalizeTask(res.data as Record<string, unknown> & MongoIdLike);
   },
 
   async updateTask(taskId: string, input: UpdateTaskInput): Promise<Task> {
     const res = await apiClient.patch(`/tasks/${taskId}`, input);
-    return normalizeId(res.data as Record<string, unknown> & MongoIdLike) as unknown as Task;
+    return normalizeTask(res.data as Record<string, unknown> & MongoIdLike);
   },
 
   async transitionTask(taskId: string, input: TransitionTaskInput): Promise<Task> {
     const res = await apiClient.post(`/tasks/${taskId}/transition`, input);
-    return normalizeId(res.data as Record<string, unknown> & MongoIdLike) as unknown as Task;
+    return normalizeTask(res.data as Record<string, unknown> & MongoIdLike);
   },
 
   async deleteTask(taskId: string): Promise<void> {

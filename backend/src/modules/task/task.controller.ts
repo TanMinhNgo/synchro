@@ -33,6 +33,19 @@ function getTaskProjectId(task: unknown): string {
   return projectId;
 }
 
+function getProjectId(project: unknown): string {
+  if (!project || typeof project !== 'object')
+    throw new Error('Invalid project payload');
+  const raw = (project as { id?: unknown; _id?: unknown }).id ??
+    (project as { id?: unknown; _id?: unknown })._id;
+  if (typeof raw === 'string' && raw) return raw;
+  if (raw && typeof raw === 'object' && 'toString' in raw) {
+    const v = (raw as { toString: () => string }).toString();
+    if (v) return v;
+  }
+  throw new Error('Invalid project payload');
+}
+
 @Controller()
 @ApiTags('tasks')
 @ApiBearerAuth()
@@ -54,16 +67,16 @@ export class TaskController {
     @Query('assigneeId') assigneeId?: string,
   ) {
     const userId = (user as CurrentUserClaims).sub;
-    return this.projects
-      .getProject(userId, projectId)
-      .then(() =>
-        this.tasks.listByProject(userId, projectId, {
+    return this.projects.getProject(userId, projectId).then((p) => {
+      const resolvedProjectId = getProjectId(p.project);
+      return this.tasks
+        .listByProject(userId, resolvedProjectId, {
           boardId,
           columnKey,
           assigneeId,
-        }),
-      )
-      .then((r) => r.tasks);
+        })
+        .then((r) => r.tasks);
+    });
   }
 
   @Post('projects/:projectId/tasks')
@@ -74,10 +87,12 @@ export class TaskController {
     @Body() dto: CreateTaskDto,
   ) {
     const userId = (user as CurrentUserClaims).sub;
-    return this.projects
-      .getProject(userId, projectId)
-      .then(() => this.tasks.create(userId, projectId, dto))
-      .then((r) => r.task);
+    return this.projects.getProject(userId, projectId).then((p) => {
+      const resolvedProjectId = getProjectId(p.project);
+      return this.tasks
+        .create(userId, resolvedProjectId, dto)
+        .then((r) => r.task);
+    });
   }
 
   @Get('tasks/:taskId')

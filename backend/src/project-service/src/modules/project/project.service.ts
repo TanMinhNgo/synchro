@@ -4,6 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { isValidObjectId } from 'mongoose';
 import type { CreateBoardDto } from '@/contracts/project/dto/create-board.dto';
 import type { CreateColumnDto } from '@/contracts/project/dto/create-column.dto';
 import type { CreateLabelDto } from '@/contracts/project/dto/create-label.dto';
@@ -17,15 +18,78 @@ import { ProjectRepository } from './project.repository';
 export class ProjectService {
   constructor(private readonly repo: ProjectRepository) {}
 
+  private getIdValue(obj: unknown): string {
+    if (!obj || typeof obj !== 'object') throw new Error('Invalid payload');
+    const raw = (obj as { id?: unknown; _id?: unknown }).id ??
+      (obj as { id?: unknown; _id?: unknown })._id;
+    if (typeof raw === 'string' && raw) return raw;
+    if (raw && typeof raw === 'object' && 'toString' in raw) {
+      const v = (raw as { toString: () => string }).toString();
+      if (v) return v;
+    }
+    throw new Error('Invalid payload');
+  }
+
+  private slugify(input: string): string {
+    const base = (input ?? '')
+      .trim()
+      .toLowerCase()
+      .normalize('NFKD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)+/g, '')
+      .replace(/-+/g, '-');
+    return base || 'project';
+  }
+
+  private async generateUniqueSlug(name: string): Promise<string> {
+    const base = this.slugify(name);
+    for (let i = 0; i < 50; i++) {
+      const candidate = i === 0 ? base : `${base}-${i + 1}`;
+      const exists = await this.repo.findProjectBySlug(candidate);
+      if (!exists) return candidate;
+    }
+    throw new BadRequestException('Unable to generate project slug');
+  }
+
+  private async ensureProjectHasSlug(project: any, projectId: string) {
+    if (project?.slug) return project;
+    if (!project?.name) return project;
+    const slug = await this.generateUniqueSlug(String(project.name));
+    const updated = await this.repo.setProjectSlugById(projectId, slug);
+    return updated ?? project;
+  }
+
+  private async getProjectByIdOrSlug(userId: string, idOrSlug: string) {
+    const project = isValidObjectId(idOrSlug)
+      ? await this.repo.findProjectById(idOrSlug)
+      : await this.repo.findProjectBySlug(idOrSlug);
+
+    if (!project) throw new NotFoundException('Project not found');
+    this.assertAccess(project, userId);
+
+    const projectId = isValidObjectId(idOrSlug) ? idOrSlug : this.getIdValue(project);
+    const ensured = await this.ensureProjectHasSlug(project, projectId);
+    return { project: ensured, projectId };
+  }
+
   async listProjects(userId: string) {
-    return this.repo.findProjectsForUser(userId);
+    const projects = await this.repo.findProjectsForUser(userId);
+    const out: any[] = [];
+    for (const p of projects) {
+      const id = this.getIdValue(p);
+      out.push(await this.ensureProjectHasSlug(p as any, id));
+    }
+    return out;
   }
 
   async createProject(userId: string, dto: CreateProjectDto) {
+    const slug = await this.generateUniqueSlug(dto.name);
     const project = await this.repo.createProject({
       ownerId: userId,
       name: dto.name,
       description: dto.description,
+      slug,
       memberIds: dto.memberIds ?? [],
     });
     return project.toObject();
@@ -41,45 +105,52 @@ export class ProjectService {
   }
 
   async getProject(userId: string, projectId: string) {
-    const project = await this.repo.findProjectById(projectId);
-    if (!project) throw new NotFoundException('Project not found');
-    this.assertAccess(project, userId);
+    const { project } = await this.getProjectByIdOrSlug(userId, projectId);
     return project;
   }
 
   async updateProject(userId: string, projectId: string, dto: UpdateProjectDto) {
-    const existing = await this.repo.findProjectById(projectId);
-    if (!existing) throw new NotFoundException('Project not found');
-    this.assertAccess(existing, userId);
+    const { project: existing, projectId: resolvedProjectId } =
+      await this.getProjectByIdOrSlug(userId, projectId);
 
-    const updated = await this.repo.updateProject(projectId, {
+    if (dto.memberIds !== undefined && existing.ownerId !== userId) {
+      throw new ForbiddenException('Only owner can update members');
+    }
+
+    const updated = await this.repo.updateProject(resolvedProjectId, {
       ...(dto.name !== undefined ? { name: dto.name } : {}),
       ...(dto.description !== undefined ? { description: dto.description } : {}),
       ...(dto.memberIds !== undefined ? { memberIds: dto.memberIds } : {}),
       ...(dto.status !== undefined ? { status: dto.status } : {}),
     });
     if (!updated) throw new NotFoundException('Project not found');
-    return updated;
+    return this.ensureProjectHasSlug(updated as any, resolvedProjectId);
   }
 
   async deleteProject(userId: string, projectId: string) {
-    const existing = await this.repo.findProjectById(projectId);
-    if (!existing) throw new NotFoundException('Project not found');
+    const { project: existing, projectId: resolvedProjectId } =
+      await this.getProjectByIdOrSlug(userId, projectId);
     if (existing.ownerId !== userId)
       throw new ForbiddenException('Only owner can delete');
-    const deleted = await this.repo.deleteProject(projectId);
+    const deleted = await this.repo.deleteProject(resolvedProjectId);
     return { ok: Boolean(deleted) };
   }
 
   async listBoards(userId: string, projectId: string) {
-    await this.getProject(userId, projectId);
-    return this.repo.findBoardsByProjectId(projectId);
+    const { projectId: resolvedProjectId } = await this.getProjectByIdOrSlug(
+      userId,
+      projectId,
+    );
+    return this.repo.findBoardsByProjectId(resolvedProjectId);
   }
 
   async createBoard(userId: string, projectId: string, dto: CreateBoardDto) {
-    await this.getProject(userId, projectId);
-    const board = await this.repo.createBoard({
+    const { projectId: resolvedProjectId } = await this.getProjectByIdOrSlug(
+      userId,
       projectId,
+    );
+    const board = await this.repo.createBoard({
+      projectId: resolvedProjectId,
       name: dto.name,
       description: dto.description,
     });
@@ -106,9 +177,12 @@ export class ProjectService {
   }
 
   async listColumns(userId: string, projectId: string, boardId: string) {
-    await this.getProject(userId, projectId);
+    const { projectId: resolvedProjectId } = await this.getProjectByIdOrSlug(
+      userId,
+      projectId,
+    );
     const board = await this.repo.findBoardById(boardId);
-    if (!board || board.projectId !== projectId)
+    if (!board || board.projectId !== resolvedProjectId)
       throw new NotFoundException('Board not found');
     return this.repo.findColumnsByBoardId(boardId);
   }
@@ -119,9 +193,12 @@ export class ProjectService {
     boardId: string,
     dto: CreateColumnDto,
   ) {
-    await this.getProject(userId, projectId);
+    const { projectId: resolvedProjectId } = await this.getProjectByIdOrSlug(
+      userId,
+      projectId,
+    );
     const board = await this.repo.findBoardById(boardId);
-    if (!board || board.projectId !== projectId)
+    if (!board || board.projectId !== resolvedProjectId)
       throw new NotFoundException('Board not found');
 
     const existing = await this.repo.findColumnsByBoardId(boardId);
@@ -147,9 +224,12 @@ export class ProjectService {
     columnId: string,
     dto: UpdateColumnDto,
   ) {
-    await this.getProject(userId, projectId);
+    const { projectId: resolvedProjectId } = await this.getProjectByIdOrSlug(
+      userId,
+      projectId,
+    );
     const board = await this.repo.findBoardById(boardId);
-    if (!board || board.projectId !== projectId)
+    if (!board || board.projectId !== resolvedProjectId)
       throw new NotFoundException('Board not found');
 
     const updated = await this.repo.updateColumn(columnId, {
@@ -161,15 +241,21 @@ export class ProjectService {
   }
 
   async listLabels(userId: string, projectId: string) {
-    await this.getProject(userId, projectId);
-    return this.repo.findLabelsByProjectId(projectId);
+    const { projectId: resolvedProjectId } = await this.getProjectByIdOrSlug(
+      userId,
+      projectId,
+    );
+    return this.repo.findLabelsByProjectId(resolvedProjectId);
   }
 
   async createLabel(userId: string, projectId: string, dto: CreateLabelDto) {
-    await this.getProject(userId, projectId);
+    const { projectId: resolvedProjectId } = await this.getProjectByIdOrSlug(
+      userId,
+      projectId,
+    );
     try {
       const label = await this.repo.createLabel({
-        projectId,
+        projectId: resolvedProjectId,
         name: dto.name,
         color: dto.color,
       });
@@ -180,7 +266,7 @@ export class ProjectService {
   }
 
   async deleteLabel(userId: string, projectId: string, labelId: string) {
-    await this.getProject(userId, projectId);
+    await this.getProjectByIdOrSlug(userId, projectId);
     const deleted = await this.repo.deleteLabel(labelId);
     if (!deleted) throw new NotFoundException('Label not found');
     return { ok: true };

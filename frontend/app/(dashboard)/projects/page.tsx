@@ -1,30 +1,26 @@
 'use client';
 
 import * as React from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useProjects } from '@/features/project';
-import { projectApi } from '@/features/project/api/project.api';
+import { useCreateProject } from '@/features/project/hooks/use-create-project';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 
 export default function ProjectsPage() {
   const projectsQuery = useProjects();
-  const queryClient = useQueryClient();
 
   const [isCreateOpen, setIsCreateOpen] = React.useState(false);
   const [name, setName] = React.useState('');
   const [description, setDescription] = React.useState('');
 
-  const createProjectMutation = useMutation({
-    mutationFn: () => projectApi.createProject({ name: name.trim(), description: description.trim() || undefined }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['projects'] });
+  const createProjectMutation = useCreateProject({
+    onSuccess: () => {
       setIsCreateOpen(false);
       setName('');
       setDescription('');
@@ -59,7 +55,7 @@ export default function ProjectsPage() {
             onSubmit={(e) => {
               e.preventDefault();
               if (!canSubmit) return;
-              createProjectMutation.mutate();
+              createProjectMutation.mutate({ name, description });
             }}
           >
             <div className="flex flex-col gap-2">
@@ -120,7 +116,7 @@ export default function ProjectsPage() {
         )}
 
         {projects.map((project) => (
-          <Link key={project.id} href={`/projects/${project.id}`}>
+          <Link key={project.id} href={`/projects/${project.slug ?? project.id}`}>
             <Card className="hover:border-primary/50 transition-colors">
               <CardHeader className="pb-2">
                 <div className="flex justify-between items-start">

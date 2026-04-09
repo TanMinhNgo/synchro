@@ -9,6 +9,11 @@ export type Subtask = {
   isDone: boolean;
 };
 
+export type TaskAttachment = {
+  url: string;
+  title?: string;
+};
+
 @Schema({ timestamps: true })
 export class Task {
   @Prop({ required: true, index: true })
@@ -35,6 +40,9 @@ export class Task {
   @Prop({ index: true })
   assigneeId?: string;
 
+  @Prop({ type: [String], default: [], index: true })
+  assigneeIds!: string[];
+
   @Prop({ required: true, enum: Object.values(TaskPriority), index: true })
   priority!: TaskPriority;
 
@@ -53,6 +61,17 @@ export class Task {
   })
   subtasks!: Subtask[];
 
+  @Prop({
+    type: [
+      {
+        url: { type: String, required: true, maxlength: 2000 },
+        title: { type: String, required: false, maxlength: 200 },
+      },
+    ],
+    default: [],
+  })
+  attachments!: TaskAttachment[];
+
   @Prop({ required: true, min: 0, max: 999999, default: 0 })
   order!: number;
 }
@@ -62,3 +81,4 @@ export const TaskSchema = SchemaFactory.createForClass(Task);
 
 TaskSchema.index({ projectId: 1, boardId: 1, columnKey: 1, order: 1 });
 TaskSchema.index({ projectId: 1, assigneeId: 1, createdAt: -1 });
+TaskSchema.index({ projectId: 1, assigneeIds: 1, createdAt: -1 });

@@ -11,6 +11,8 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ProjectModule } from './modules/project/project.module';
 import { TaskModule } from './modules/task/task.module';
 import { NotificationModule } from './modules/notification/notification.module';
+import { GoalsModule } from './modules/goals/goals.module';
+import { ChatModule } from './modules/chat/chat.module';
 
 @Module({
   imports: [
@@ -44,6 +46,11 @@ import { NotificationModule } from './modules/notification/notification.module';
         GOOGLE_CLIENT_ID: Joi.string().optional(),
         GOOGLE_CLIENT_SECRET: Joi.string().optional(),
         GOOGLE_CALLBACK_URL: Joi.string().uri().optional(),
+
+        // Stream Chat (getstream.io)
+        STREAM_API_KEY: Joi.string().optional(),
+        STREAM_API_SECRET: Joi.string().optional(),
+        STREAM_APP_ID: Joi.string().optional(),
       }),
     }),
 
@@ -59,6 +66,8 @@ import { NotificationModule } from './modules/notification/notification.module';
     ProjectModule,
     TaskModule,
     NotificationModule,
+    GoalsModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [

@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Patch,
   Post,
   Req,
   Res,
@@ -25,6 +26,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { UserServiceClient } from './user-service.client';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 function isProd(env?: string) {
   return env === 'production';
@@ -221,6 +223,48 @@ export class AuthController {
         email: dbUser.email,
         name: dbUser.name,
         avatarUrl: dbUser.avatarUrl,
+      },
+    };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('me')
+  @ApiOperation({ summary: 'Update current user profile (name/avatar)' })
+  @ApiBearerAuth()
+  @ApiOkResponse({
+    schema: {
+      example: {
+        user: {
+          id: '65f0c0d2e2d3d4f5a6b7c8d9',
+          email: 'user@example.com',
+          name: 'Minh Ngo',
+          avatarUrl: 'https://example.com/avatar.png',
+        },
+      },
+    },
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Unauthorized (missing/invalid access token) or user not found',
+  })
+  async updateMe(
+    @CurrentUser() user: { sub: string; email: string },
+    @Body() dto: UpdateProfileDto,
+  ) {
+    if (!user?.sub) {
+      throw new UnauthorizedException('Unauthorized');
+    }
+
+    const updated = await this.users.updateProfile(user.sub, {
+      name: dto.name,
+      avatarUrl: dto.avatarUrl,
+    });
+
+    return {
+      user: {
+        id: updated.id,
+        email: updated.email,
+        name: updated.name,
+        avatarUrl: updated.avatarUrl,
       },
     };
   }

@@ -2,11 +2,11 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { projectApi } from '@/features/project';
+import { useProject } from '@/features/project/hooks/use-project';
+import { useProjectBoards } from '@/features/project/hooks/use-project-boards';
 
 export default function ProjectOverviewPage({
   params,
@@ -15,20 +15,10 @@ export default function ProjectOverviewPage({
 }) {
   const { projectId } = React.use(params);
 
-  const projectQuery = useQuery({
-    queryKey: ['projects', projectId],
-    queryFn: () => projectApi.getProject(projectId),
-    enabled: Boolean(projectId),
-  });
-
-  const boardsQuery = useQuery({
-    queryKey: ['projects', projectId, 'boards'],
-    queryFn: () => projectApi.listBoards(projectId),
-    enabled: Boolean(projectId),
-  });
+  const projectQuery = useProject(projectId);
+  const boardsQuery = useProjectBoards(projectId);
 
   const project = projectQuery.data;
-  const boardId = boardsQuery.data?.[0]?.id;
 
   return (
     <div className="space-y-6">
