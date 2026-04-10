@@ -27,5 +27,6 @@ import { TASK_SERVICE_NATS_CLIENT } from './task-service.nats';
   ],
   controllers: [TaskController],
   providers: [TaskServiceClient],
+  exports: [TaskServiceClient],
 })
 export class TaskModule {}

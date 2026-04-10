@@ -11,6 +11,7 @@ import { TaskKanbanBoard } from './_components/TaskKanbanBoard';
 import { CreateTaskDialog } from './_components/CreateTaskDialog';
 import { EditTaskDialog } from './_components/EditTaskDialog';
 import { DeleteTaskAlert } from './_components/DeleteTaskAlert';
+import { AiAgentPanel } from './_components/AiAgentPanel';
 
 export default function MyTasksPage() {
     const { isLoading, isError, items, currentUserQuery, projectsQuery } = useMyTasksKanban();
@@ -47,6 +48,12 @@ export default function MyTasksPage() {
 
     return (
         <div className="flex h-full flex-col gap-6 p-2">
+            <AiAgentPanel
+                tasks={filteredItems}
+                projects={projects}
+                selectedProjectId={selectedProjectId}
+            />
+
             <TaskCalendarCard items={filteredItems} isLoading={isLoading} isError={isError} />
 
             {/* All Task Section */}

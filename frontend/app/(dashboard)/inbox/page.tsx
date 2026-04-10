@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import {
   useMarkAllNotificationsRead,
   useMarkNotificationRead,
+  useNotificationRealtime,
   useNotifications,
 } from '@/features/notification';
 import { useProjects } from '@/features/project/hooks/useProjects';
@@ -34,11 +35,18 @@ function getStringData(n: Notification, key: string): string | undefined {
   return typeof value === 'string' && value.trim() ? value : undefined;
 }
 
+function getNumberData(n: Notification, key: string): number | undefined {
+  const value = n.data?.[key];
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  return undefined;
+}
+
 export default function InboxPage() {
   const [readFilter, setReadFilter] = React.useState<ReadFilter>('all');
   const [typeFilter, setTypeFilter] = React.useState<string>('all');
 
   const notificationsQuery = useNotifications();
+  useNotificationRealtime();
   const projectsQuery = useProjects();
   const markReadMutation = useMarkNotificationRead();
   const markAllReadMutation = useMarkAllNotificationsRead();
@@ -194,6 +202,22 @@ export default function InboxPage() {
                       <CardDescription className="mt-1">
                         {n.message ?? '—'}
                       </CardDescription>
+
+                      {n.type === 'AI_TASK_REPORT_REVIEW' ? (
+                        <div className="mt-2 flex flex-wrap items-center gap-2">
+                          {getStringData(n, 'verdict') ? (
+                            <Badge variant="secondary">Verdict: {getStringData(n, 'verdict')}</Badge>
+                          ) : null}
+                          {typeof getNumberData(n, 'score') === 'number' ? (
+                            <Badge variant="outline">Score: {getNumberData(n, 'score')}/100</Badge>
+                          ) : null}
+                          {getStringData(n, 'llmSummary') ? (
+                            <span className="text-xs text-muted-foreground">
+                              {getStringData(n, 'llmSummary')}
+                            </span>
+                          ) : null}
+                        </div>
+                      ) : null}
                     </div>
                     <div className="flex shrink-0 flex-col items-end gap-2">
                       {createdAt ? (

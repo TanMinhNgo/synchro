@@ -38,5 +38,6 @@ import { NotificationProxyService } from './notification.proxy.service';
     NotificationProxyService,
     NotificationGateway,
   ],
+  exports: [NotificationProxyService],
 })
 export class NotificationModule {}

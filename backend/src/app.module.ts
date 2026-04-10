@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { SentryModule } from '@sentry/nestjs/setup';
 import Joi from 'joi';
 import { AppController } from './app.controller';
@@ -13,6 +14,7 @@ import { TaskModule } from './modules/task/task.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { GoalsModule } from './modules/goals/goals.module';
 import { ChatModule } from './modules/chat/chat.module';
+import { AiAgentModule } from './modules/ai-agent/ai-agent.module';
 
 @Module({
   imports: [
@@ -51,8 +53,20 @@ import { ChatModule } from './modules/chat/chat.module';
         STREAM_API_KEY: Joi.string().optional(),
         STREAM_API_SECRET: Joi.string().optional(),
         STREAM_APP_ID: Joi.string().optional(),
+
+        AI_REVIEW_PROVIDER: Joi.string()
+          .valid('none', 'openai', 'azure-openai')
+          .optional(),
+        OPENAI_API_KEY: Joi.string().optional(),
+        OPENAI_MODEL: Joi.string().optional(),
+        AZURE_OPENAI_ENDPOINT: Joi.string().uri().optional(),
+        AZURE_OPENAI_API_KEY: Joi.string().optional(),
+        AZURE_OPENAI_DEPLOYMENT: Joi.string().optional(),
+        AZURE_OPENAI_API_VERSION: Joi.string().optional(),
       }),
     }),
+
+    EventEmitterModule.forRoot(),
 
     SentryModule.forRoot(),
     MongooseModule.forRootAsync({
@@ -68,6 +82,7 @@ import { ChatModule } from './modules/chat/chat.module';
     NotificationModule,
     GoalsModule,
     ChatModule,
+    AiAgentModule,
   ],
   controllers: [AppController],
   providers: [
