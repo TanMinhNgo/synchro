@@ -3,7 +3,13 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useProject } from '@/features/project/hooks/use-project';
 import { useProjectBoards } from '@/features/project/hooks/use-project-boards';
@@ -25,7 +31,9 @@ export default function ProjectOverviewPage({
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
-            {projectQuery.isLoading ? 'Loading project…' : project?.name ?? 'Project'}
+            {projectQuery.isLoading
+              ? 'Loading project…'
+              : (project?.name ?? 'Project')}
           </h1>
           <p className="text-muted-foreground">Project overview.</p>
         </div>
@@ -62,7 +70,9 @@ export default function ProjectOverviewPage({
                 <CardTitle className="text-xl">Details</CardTitle>
                 <CardDescription>{project.description ?? '—'}</CardDescription>
               </div>
-              <Badge variant={project.status === 'ACTIVE' ? 'default' : 'secondary'}>
+              <Badge
+                variant={project.status === 'ACTIVE' ? 'default' : 'secondary'}
+              >
                 {project.status}
               </Badge>
             </div>

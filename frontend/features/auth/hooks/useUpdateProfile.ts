@@ -9,7 +9,8 @@ export function useUpdateProfile() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (input: UpdateProfileInput) => authApi.updateProfile(input),
+    mutationFn: async (input: UpdateProfileInput) =>
+      authApi.updateProfile(input),
     onSuccess: (user) => {
       const token = localStorage.getItem('access_token') ?? '';
       if (token) {

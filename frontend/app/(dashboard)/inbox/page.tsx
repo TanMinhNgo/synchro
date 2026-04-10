@@ -1,12 +1,29 @@
-"use client";
+'use client';
 
 import * as React from 'react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyTitle,
+} from '@/components/ui/empty';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   useMarkAllNotificationsRead,
   useMarkNotificationRead,
@@ -51,7 +68,10 @@ export default function InboxPage() {
   const markReadMutation = useMarkNotificationRead();
   const markAllReadMutation = useMarkAllNotificationsRead();
 
-  const notifications = React.useMemo(() => notificationsQuery.data ?? [], [notificationsQuery.data]);
+  const notifications = React.useMemo(
+    () => notificationsQuery.data ?? [],
+    [notificationsQuery.data],
+  );
 
   const projectSegmentById = React.useMemo(() => {
     const m = new Map<string, string>();
@@ -66,10 +86,15 @@ export default function InboxPage() {
       const projectId = getStringData(n, 'projectId');
       const taskId = getStringData(n, 'taskId');
 
-      const projectSeg = projectId ? projectSegmentById.get(projectId) ?? projectId : undefined;
+      const projectSeg = projectId
+        ? (projectSegmentById.get(projectId) ?? projectId)
+        : undefined;
 
       if (projectSeg && taskId) {
-        return { href: `/projects/${projectSeg}/board`, label: 'View in board' };
+        return {
+          href: `/projects/${projectSeg}/board`,
+          label: 'View in board',
+        };
       }
 
       if (projectSeg) {
@@ -118,7 +143,10 @@ export default function InboxPage() {
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground">Read</span>
-            <Select value={readFilter} onValueChange={(v) => setReadFilter(v as ReadFilter)}>
+            <Select
+              value={readFilter}
+              onValueChange={(v) => setReadFilter(v as ReadFilter)}
+            >
               <SelectTrigger className="w-40">
                 <SelectValue placeholder="Read" />
               </SelectTrigger>
@@ -166,9 +194,12 @@ export default function InboxPage() {
       {notificationsQuery.isError && (
         <Card className="border-destructive/30">
           <CardHeader>
-            <CardTitle className="text-base">Failed to load notifications</CardTitle>
+            <CardTitle className="text-base">
+              Failed to load notifications
+            </CardTitle>
             <CardDescription>
-              {(notificationsQuery.error as Error | undefined)?.message ?? 'Unknown error'}
+              {(notificationsQuery.error as Error | undefined)?.message ??
+                'Unknown error'}
             </CardDescription>
           </CardHeader>
         </Card>
@@ -190,7 +221,10 @@ export default function InboxPage() {
             const link = getNotificationLink(n);
             const createdAt = formatTimestamp(n.createdAt);
             return (
-              <Card key={n.id} className={n.read ? undefined : 'border-primary/30'}>
+              <Card
+                key={n.id}
+                className={n.read ? undefined : 'border-primary/30'}
+              >
                 <CardHeader className="space-y-2">
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0">
@@ -206,10 +240,14 @@ export default function InboxPage() {
                       {n.type === 'AI_TASK_REPORT_REVIEW' ? (
                         <div className="mt-2 flex flex-wrap items-center gap-2">
                           {getStringData(n, 'verdict') ? (
-                            <Badge variant="secondary">Verdict: {getStringData(n, 'verdict')}</Badge>
+                            <Badge variant="secondary">
+                              Verdict: {getStringData(n, 'verdict')}
+                            </Badge>
                           ) : null}
                           {typeof getNumberData(n, 'score') === 'number' ? (
-                            <Badge variant="outline">Score: {getNumberData(n, 'score')}/100</Badge>
+                            <Badge variant="outline">
+                              Score: {getNumberData(n, 'score')}/100
+                            </Badge>
                           ) : null}
                           {getStringData(n, 'llmSummary') ? (
                             <span className="text-xs text-muted-foreground">
@@ -221,7 +259,9 @@ export default function InboxPage() {
                     </div>
                     <div className="flex shrink-0 flex-col items-end gap-2">
                       {createdAt ? (
-                        <span className="text-xs text-muted-foreground">{createdAt}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {createdAt}
+                        </span>
                       ) : null}
                       <div className="flex items-center gap-2">
                         <Button

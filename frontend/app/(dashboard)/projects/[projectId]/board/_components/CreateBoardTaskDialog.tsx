@@ -1,12 +1,22 @@
 'use client';
 
 import * as React from 'react';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { X } from 'lucide-react';
 import {
   Select,
@@ -44,7 +54,9 @@ export function CreateBoardTaskDialog({
   const [assigneeIds, setAssigneeIds] = React.useState<string[]>([]);
   const [subtasks, setSubtasks] = React.useState<SubtaskDraft[]>([]);
   const [newSubtaskTitle, setNewSubtaskTitle] = React.useState('');
-  const [attachments, setAttachments] = React.useState<Array<{ id: string; url: string; title: string }>>([]);
+  const [attachments, setAttachments] = React.useState<
+    Array<{ id: string; url: string; title: string }>
+  >([]);
   const [newAttachmentUrl, setNewAttachmentUrl] = React.useState('');
   const [newAttachmentTitle, setNewAttachmentTitle] = React.useState('');
 
@@ -86,7 +98,9 @@ export function CreateBoardTaskDialog({
     },
   });
 
-  const canCreate = Boolean(boardId && columnKey && title.trim().length > 0) && !createTaskMutation.isPending;
+  const canCreate =
+    Boolean(boardId && columnKey && title.trim().length > 0) &&
+    !createTaskMutation.isPending;
 
   return (
     <Dialog
@@ -107,11 +121,17 @@ export function CreateBoardTaskDialog({
             if (!boardId || !columnKey) return;
 
             const dueDate = datetimeLocalToIso(dueAt);
-            const mappedSubtasks = subtasks.map((s) => ({ title: s.title, isDone: s.isDone }));
+            const mappedSubtasks = subtasks.map((s) => ({
+              title: s.title,
+              isDone: s.isDone,
+            }));
             const mappedAttachments = attachments
               .map((a) => ({ url: a.url.trim(), title: a.title.trim() }))
               .filter((a) => a.url.length > 0)
-              .map((a) => ({ url: a.url, ...(a.title ? { title: a.title } : {}) }));
+              .map((a) => ({
+                url: a.url,
+                ...(a.title ? { title: a.title } : {}),
+              }));
 
             createTaskMutation.mutate({
               projectId,
@@ -122,24 +142,39 @@ export function CreateBoardTaskDialog({
               priority,
               ...(assigneeIds.length > 0 ? { assigneeIds } : {}),
               ...(dueDate ? { dueDate } : {}),
-              ...(mappedSubtasks.length > 0 ? { subtasks: mappedSubtasks } : {}),
-              ...(mappedAttachments.length > 0 ? { attachments: mappedAttachments } : {}),
+              ...(mappedSubtasks.length > 0
+                ? { subtasks: mappedSubtasks }
+                : {}),
+              ...(mappedAttachments.length > 0
+                ? { attachments: mappedAttachments }
+                : {}),
             });
           }}
         >
           <div className="flex flex-col gap-2">
             <label className="text-sm font-medium">Title</label>
-            <Input value={title} onChange={(e) => setTitle(e.target.value)} autoFocus />
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              autoFocus
+            />
           </div>
 
           <div className="flex flex-col gap-2">
             <label className="text-sm font-medium">Description</label>
-            <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Optional" />
+            <Textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Optional"
+            />
           </div>
 
           <div className="flex flex-col gap-2">
             <label className="text-sm font-medium">Priority</label>
-            <Select value={priority} onValueChange={(v) => setPriority(v as Task['priority'])}>
+            <Select
+              value={priority}
+              onValueChange={(v) => setPriority(v as Task['priority'])}
+            >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select priority" />
               </SelectTrigger>
@@ -156,7 +191,11 @@ export function CreateBoardTaskDialog({
             <label className="text-sm font-medium">Assignees</label>
             <Popover>
               <PopoverTrigger asChild>
-                <Button type="button" variant="outline" className="w-full justify-start gap-2 h-auto min-h-10 flex-wrap">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full justify-start gap-2 h-auto min-h-10 flex-wrap"
+                >
                   {selectedAssignees.length > 0 ? (
                     selectedAssignees.map((a) => (
                       <span
@@ -170,7 +209,9 @@ export function CreateBoardTaskDialog({
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            setAssigneeIds((prev) => prev.filter((id) => id !== a.id));
+                            setAssigneeIds((prev) =>
+                              prev.filter((id) => id !== a.id),
+                            );
                           }}
                           aria-label={`Remove ${a.name}`}
                         >
@@ -204,7 +245,8 @@ export function CreateBoardTaskDialog({
                           onCheckedChange={(next) => {
                             const isChecked = next === true;
                             setAssigneeIds((prev) => {
-                              if (isChecked) return Array.from(new Set([...prev, m.id]));
+                              if (isChecked)
+                                return Array.from(new Set([...prev, m.id]));
                               return prev.filter((id) => id !== m.id);
                             });
                           }}
@@ -220,7 +262,11 @@ export function CreateBoardTaskDialog({
 
           <div className="flex flex-col gap-2">
             <label className="text-sm font-medium">Deadline</label>
-            <Input type="datetime-local" value={dueAt} onChange={(e) => setDueAt(e.target.value)} />
+            <Input
+              type="datetime-local"
+              value={dueAt}
+              onChange={(e) => setDueAt(e.target.value)}
+            />
           </div>
 
           <div className="flex flex-col gap-2">
@@ -232,17 +278,30 @@ export function CreateBoardTaskDialog({
                     checked={s.isDone}
                     onCheckedChange={(checked) => {
                       const isDone = checked === true;
-                      setSubtasks((prev) => prev.map((p) => (p.id === s.id ? { ...p, isDone } : p)));
+                      setSubtasks((prev) =>
+                        prev.map((p) => (p.id === s.id ? { ...p, isDone } : p)),
+                      );
                     }}
                   />
                   <Input
                     value={s.title}
                     onChange={(e) => {
                       const nextTitle = e.target.value;
-                      setSubtasks((prev) => prev.map((p) => (p.id === s.id ? { ...p, title: nextTitle } : p)));
+                      setSubtasks((prev) =>
+                        prev.map((p) =>
+                          p.id === s.id ? { ...p, title: nextTitle } : p,
+                        ),
+                      );
                     }}
                   />
-                  <Button type="button" variant="ghost" size="sm" onClick={() => setSubtasks((prev) => prev.filter((p) => p.id !== s.id))}>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() =>
+                      setSubtasks((prev) => prev.filter((p) => p.id !== s.id))
+                    }
+                  >
                     Remove
                   </Button>
                 </div>
@@ -250,7 +309,11 @@ export function CreateBoardTaskDialog({
             </div>
 
             <div className="flex items-center gap-2">
-              <Input value={newSubtaskTitle} onChange={(e) => setNewSubtaskTitle(e.target.value)} placeholder="New subtask" />
+              <Input
+                value={newSubtaskTitle}
+                onChange={(e) => setNewSubtaskTitle(e.target.value)}
+                placeholder="New subtask"
+              />
               <Button
                 type="button"
                 size="sm"
@@ -258,7 +321,10 @@ export function CreateBoardTaskDialog({
                 onClick={() => {
                   const nextTitle = newSubtaskTitle.trim();
                   if (!nextTitle) return;
-                  setSubtasks((prev) => [...prev, { id: newLocalId(), title: nextTitle, isDone: false }]);
+                  setSubtasks((prev) => [
+                    ...prev,
+                    { id: newLocalId(), title: nextTitle, isDone: false },
+                  ]);
                   setNewSubtaskTitle('');
                 }}
                 disabled={!newSubtaskTitle.trim()}
@@ -272,12 +338,17 @@ export function CreateBoardTaskDialog({
             <label className="text-sm font-medium">Attachments</label>
             <div className="flex flex-col gap-2">
               {attachments.map((a) => (
-                <div key={a.id} className="grid grid-cols-1 gap-2 md:grid-cols-3">
+                <div
+                  key={a.id}
+                  className="grid grid-cols-1 gap-2 md:grid-cols-3"
+                >
                   <Input
                     value={a.title}
                     onChange={(e) => {
                       const title = e.target.value;
-                      setAttachments((prev) => prev.map((p) => (p.id === a.id ? { ...p, title } : p)));
+                      setAttachments((prev) =>
+                        prev.map((p) => (p.id === a.id ? { ...p, title } : p)),
+                      );
                     }}
                     placeholder="Title (optional)"
                   />
@@ -286,7 +357,9 @@ export function CreateBoardTaskDialog({
                       value={a.url}
                       onChange={(e) => {
                         const url = e.target.value;
-                        setAttachments((prev) => prev.map((p) => (p.id === a.id ? { ...p, url } : p)));
+                        setAttachments((prev) =>
+                          prev.map((p) => (p.id === a.id ? { ...p, url } : p)),
+                        );
                       }}
                       placeholder="https://..."
                     />
@@ -294,7 +367,11 @@ export function CreateBoardTaskDialog({
                       type="button"
                       variant="ghost"
                       size="sm"
-                      onClick={() => setAttachments((prev) => prev.filter((p) => p.id !== a.id))}
+                      onClick={() =>
+                        setAttachments((prev) =>
+                          prev.filter((p) => p.id !== a.id),
+                        )
+                      }
                     >
                       Remove
                     </Button>
@@ -324,7 +401,11 @@ export function CreateBoardTaskDialog({
                     if (!url) return;
                     setAttachments((prev) => [
                       ...prev,
-                      { id: newLocalId(), url, title: newAttachmentTitle.trim() },
+                      {
+                        id: newLocalId(),
+                        url,
+                        title: newAttachmentTitle.trim(),
+                      },
                     ]);
                     setNewAttachmentUrl('');
                     setNewAttachmentTitle('');
@@ -339,7 +420,8 @@ export function CreateBoardTaskDialog({
 
           {createTaskMutation.isError && (
             <div className="text-sm text-destructive">
-              {(createTaskMutation.error as Error)?.message ?? 'Failed to create task.'}
+              {(createTaskMutation.error as Error)?.message ??
+                'Failed to create task.'}
             </div>
           )}
 

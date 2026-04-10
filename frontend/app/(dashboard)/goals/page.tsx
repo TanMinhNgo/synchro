@@ -1,9 +1,14 @@
-"use client";
+'use client';
 
 import * as React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -24,8 +29,18 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
-import { useCreateGoal, useDeleteGoal, useGoals, useUpdateGoal } from '@/features/goal';
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyTitle,
+} from '@/components/ui/empty';
+import {
+  useCreateGoal,
+  useDeleteGoal,
+  useGoals,
+  useUpdateGoal,
+} from '@/features/goal';
 import type { Goal } from '@/shared/types/api/goal';
 
 function isoToDateInput(value?: string) {
@@ -96,7 +111,9 @@ export default function GoalsPage() {
       <div className="flex items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Goals</h1>
-          <p className="text-muted-foreground">Track objectives and progress.</p>
+          <p className="text-muted-foreground">
+            Track objectives and progress.
+          </p>
         </div>
         <Button onClick={() => setCreateOpen(true)} disabled={isBusy}>
           New goal
@@ -108,7 +125,8 @@ export default function GoalsPage() {
           <CardHeader>
             <CardTitle className="text-base">Failed to load goals</CardTitle>
             <CardDescription>
-              {(goalsQuery.error as Error | undefined)?.message ?? 'Unknown error'}
+              {(goalsQuery.error as Error | undefined)?.message ??
+                'Unknown error'}
             </CardDescription>
           </CardHeader>
         </Card>
@@ -118,7 +136,9 @@ export default function GoalsPage() {
         <Empty>
           <EmptyHeader>
             <EmptyTitle>No goals yet</EmptyTitle>
-            <EmptyDescription>Create your first goal to start tracking progress.</EmptyDescription>
+            <EmptyDescription>
+              Create your first goal to start tracking progress.
+            </EmptyDescription>
           </EmptyHeader>
         </Empty>
       )}
@@ -127,23 +147,35 @@ export default function GoalsPage() {
         <div className="space-y-2">
           {goals
             .slice()
-            .sort((a, b) => (b.createdAt ?? '').localeCompare(a.createdAt ?? ''))
+            .sort((a, b) =>
+              (b.createdAt ?? '').localeCompare(a.createdAt ?? ''),
+            )
             .map((g) => (
               <Card key={g.id}>
                 <CardHeader className="space-y-2">
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0">
                       <CardTitle className="text-base">{g.title}</CardTitle>
-                      <CardDescription className="mt-1">{g.description ?? '—'}</CardDescription>
+                      <CardDescription className="mt-1">
+                        {g.description ?? '—'}
+                      </CardDescription>
                       <div className="mt-2 flex flex-wrap items-center gap-2">
-                        <Badge variant="outline">{clampProgress(g.progress)}%</Badge>
+                        <Badge variant="outline">
+                          {clampProgress(g.progress)}%
+                        </Badge>
                         {g.targetDate ? (
-                          <Badge variant="secondary">Target: {isoToDateInput(g.targetDate)}</Badge>
+                          <Badge variant="secondary">
+                            Target: {isoToDateInput(g.targetDate)}
+                          </Badge>
                         ) : null}
                       </div>
                     </div>
                     <div className="flex shrink-0 items-center gap-2">
-                      <Button variant="outline" size="sm" onClick={() => setEditGoal(g)}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setEditGoal(g)}
+                      >
                         Edit
                       </Button>
                       <Button
@@ -256,7 +288,10 @@ export default function GoalsPage() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={Boolean(editGoal)} onOpenChange={(open) => !open && setEditGoal(null)}>
+      <Dialog
+        open={Boolean(editGoal)}
+        onOpenChange={(open) => !open && setEditGoal(null)}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit goal</DialogTitle>
@@ -275,7 +310,10 @@ export default function GoalsPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-sm font-medium" htmlFor="editGoalDescription">
+              <label
+                className="text-sm font-medium"
+                htmlFor="editGoalDescription"
+              >
                 Description
               </label>
               <Textarea
@@ -287,7 +325,10 @@ export default function GoalsPage() {
 
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium" htmlFor="editGoalTargetDate">
+                <label
+                  className="text-sm font-medium"
+                  htmlFor="editGoalTargetDate"
+                >
                   Target date
                 </label>
                 <Input
@@ -298,7 +339,10 @@ export default function GoalsPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium" htmlFor="editGoalProgress">
+                <label
+                  className="text-sm font-medium"
+                  htmlFor="editGoalProgress"
+                >
                   Progress (%)
                 </label>
                 <Input
@@ -327,7 +371,9 @@ export default function GoalsPage() {
               Cancel
             </Button>
             <Button
-              disabled={updateGoalMutation.isPending || !editGoal || !title.trim()}
+              disabled={
+                updateGoalMutation.isPending || !editGoal || !title.trim()
+              }
               onClick={() => {
                 if (!editGoal) return;
                 updateGoalMutation.mutate(
@@ -350,7 +396,10 @@ export default function GoalsPage() {
         </DialogContent>
       </Dialog>
 
-      <AlertDialog open={Boolean(deleteGoal)} onOpenChange={(open) => !open && setDeleteGoal(null)}>
+      <AlertDialog
+        open={Boolean(deleteGoal)}
+        onOpenChange={(open) => !open && setDeleteGoal(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete goal</AlertDialogTitle>
@@ -359,7 +408,9 @@ export default function GoalsPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleteGoalMutation.isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={deleteGoalMutation.isPending}>
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 if (!deleteGoal) return;

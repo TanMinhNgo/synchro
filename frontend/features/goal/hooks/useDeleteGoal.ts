@@ -7,7 +7,8 @@ export function useDeleteGoal() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (params: { goalId: string }) => goalApi.remove(params.goalId),
+    mutationFn: async (params: { goalId: string }) =>
+      goalApi.remove(params.goalId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['goals'] });
     },

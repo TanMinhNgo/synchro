@@ -1,25 +1,54 @@
-"use client";
+'use client';
 
 import * as React from 'react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyTitle,
+} from '@/components/ui/empty';
 import { useMyTasksKanban } from '@/features/task/hooks/useMyTasksKanban';
 
 export default function PortfolioPage() {
-  const { isLoading, isError, items, projectsQuery, taskQueries, currentUserQuery } = useMyTasksKanban();
+  const {
+    isLoading,
+    isError,
+    items,
+    projectsQuery,
+    taskQueries,
+    currentUserQuery,
+  } = useMyTasksKanban();
 
-  const projects = React.useMemo(() => projectsQuery.data ?? [], [projectsQuery.data]);
+  const projects = React.useMemo(
+    () => projectsQuery.data ?? [],
+    [projectsQuery.data],
+  );
 
   const now = React.useMemo(() => new Date(), []);
 
   const metricsByProjectId = React.useMemo(() => {
-    const map = new Map<string, { total: number; open: number; done: number; overdue: number }>();
+    const map = new Map<
+      string,
+      { total: number; open: number; done: number; overdue: number }
+    >();
 
     for (const item of items) {
-      const entry = map.get(item.projectId) ?? { total: 0, open: 0, done: 0, overdue: 0 };
+      const entry = map.get(item.projectId) ?? {
+        total: 0,
+        open: 0,
+        done: 0,
+        overdue: 0,
+      };
       entry.total++;
 
       if (item.task.columnKey === 'done') {
@@ -47,13 +76,17 @@ export default function PortfolioPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Portfolio</h1>
-        <p className="text-muted-foreground">Browse your workspaces and collections.</p>
+        <p className="text-muted-foreground">
+          Browse your workspaces and collections.
+        </p>
       </div>
 
       {isError && (
         <Card className="border-destructive/30">
           <CardHeader>
-            <CardTitle className="text-base">Failed to load portfolio</CardTitle>
+            <CardTitle className="text-base">
+              Failed to load portfolio
+            </CardTitle>
             <CardDescription>{errorMessage ?? 'Unknown error'}</CardDescription>
           </CardHeader>
         </Card>
@@ -63,7 +96,9 @@ export default function PortfolioPage() {
         <Empty>
           <EmptyHeader>
             <EmptyTitle>No projects yet</EmptyTitle>
-            <EmptyDescription>Create a project to start organizing work.</EmptyDescription>
+            <EmptyDescription>
+              Create a project to start organizing work.
+            </EmptyDescription>
           </EmptyHeader>
         </Empty>
       )}
@@ -88,7 +123,12 @@ export default function PortfolioPage() {
 
         {!isLoading &&
           projects.map((p) => {
-            const m = metricsByProjectId.get(p.id) ?? { total: 0, open: 0, done: 0, overdue: 0 };
+            const m = metricsByProjectId.get(p.id) ?? {
+              total: 0,
+              open: 0,
+              done: 0,
+              overdue: 0,
+            };
 
             return (
               <Card key={p.id}>
@@ -96,7 +136,9 @@ export default function PortfolioPage() {
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0">
                       <CardTitle className="text-base">{p.name}</CardTitle>
-                      <CardDescription className="mt-1">{p.description ?? '—'}</CardDescription>
+                      <CardDescription className="mt-1">
+                        {p.description ?? '—'}
+                      </CardDescription>
                     </div>
                     <Button asChild size="sm" variant="outline">
                       <Link href={`/projects/${p.slug ?? p.id}`}>Open</Link>

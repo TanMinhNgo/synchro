@@ -48,17 +48,17 @@ function getAssigneeColorClass(key: string) {
   return assigneeColorClasses[hashString(key) % assigneeColorClasses.length];
 }
 
-export function TaskCard({ 
-  projectTitle, 
+export function TaskCard({
+  projectTitle,
   deadline,
-  title, 
+  title,
   priority,
-  progress = 0, 
+  progress = 0,
   subtasksDone,
   subtasksTotal,
-  assignees = [], 
+  assignees = [],
   assigneeKeys = [],
-  comments = 0, 
+  comments = 0,
   links = 0,
   onOpen,
   onMenu,
@@ -114,7 +114,7 @@ export function TaskCard({
         }
       }}
       className={
-        "flex flex-col gap-4 p-5 hover:shadow-sm transition-all border border-border bg-card cursor-grab active:cursor-grabbing rounded-2xl" +
+        'flex flex-col gap-4 p-5 hover:shadow-sm transition-all border border-border bg-card cursor-grab active:cursor-grabbing rounded-2xl' +
         (isDragging ? ' opacity-0' : '')
       }
     >
@@ -136,30 +136,35 @@ export function TaskCard({
           <MoreHorizontal className="h-4 w-4" />
         </button>
       </div>
-      
+
       <div className="flex items-center gap-2">
         <div className="flex items-center gap-1 rounded-xl px-2 py-1 text-xs font-medium bg-muted/50 text-muted-foreground">
           <Calendar className="h-3 w-3" />
           <span>{deadline || '—'}</span>
         </div>
       </div>
-      
+
       <div className="flex flex-col gap-3">
         <h3 className="font-semibold text-base leading-snug">{title}</h3>
-        
+
         <div className="flex flex-col gap-1.5 mt-2">
           <Progress value={computedProgress} className="h-2 w-full bg-muted" />
           <span className="text-xs text-muted-foreground">{subtaskLabel}</span>
         </div>
       </div>
-      
+
       <div className="flex items-center justify-between mt-1">
         {assignees.length > 0 ? (
           <div className="flex -space-x-2">
             {assignees.map((assignee, i) => (
               <Avatar key={i} className="h-8 w-8 border-2 border-background">
                 <AvatarImage src={assignee.avatarUrl} />
-                <AvatarFallback className={cn('text-[10px] border', getAssigneeColorClass(assignee.name))}>
+                <AvatarFallback
+                  className={cn(
+                    'text-[10px] border',
+                    getAssigneeColorClass(assignee.name),
+                  )}
+                >
                   {assignee.name.charAt(0)}
                 </AvatarFallback>
               </Avatar>
@@ -170,16 +175,23 @@ export function TaskCard({
             {assigneeKeys.slice(0, 4).map((key) => (
               <span
                 key={key}
-                className={cn('h-3.5 w-3.5 rounded-full border', getAssigneeColorClass(key))}
+                className={cn(
+                  'h-3.5 w-3.5 rounded-full border',
+                  getAssigneeColorClass(key),
+                )}
                 aria-label="Assignee"
               />
             ))}
             {assigneeKeys.length > 4 ? (
-              <span className="ml-1 text-xs font-medium text-muted-foreground">+{assigneeKeys.length - 4}</span>
+              <span className="ml-1 text-xs font-medium text-muted-foreground">
+                +{assigneeKeys.length - 4}
+              </span>
             ) : null}
           </div>
-        ) : <div />}
-        
+        ) : (
+          <div />
+        )}
+
         <div className="flex items-center gap-3 text-muted-foreground">
           {comments > 0 && (
             <div className="flex items-center gap-1">

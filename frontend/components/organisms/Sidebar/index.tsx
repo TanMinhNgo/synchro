@@ -4,7 +4,21 @@ import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, CheckSquare, Inbox, PieChart, FolderOpen, UserCircle, Flag, HelpCircle, Plus, PanelLeftClose, MoreHorizontal, ListMinus, MessagesSquare } from 'lucide-react';
+import {
+  LayoutDashboard,
+  CheckSquare,
+  Inbox,
+  PieChart,
+  FolderOpen,
+  UserCircle,
+  Flag,
+  HelpCircle,
+  Plus,
+  PanelLeftClose,
+  MoreHorizontal,
+  ListMinus,
+  MessagesSquare,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -33,15 +47,25 @@ export function Sidebar() {
       <div className="flex items-center justify-between p-4 pl-6 pt-6">
         <div className="flex items-center gap-3 w-40 overflow-hidden">
           <Avatar className="h-10 w-10 shrink-0">
-            <AvatarImage src={user?.avatarUrl || 'https://i.pravatar.cc/150?img=9'} />
+            <AvatarImage
+              src={user?.avatarUrl || 'https://i.pravatar.cc/150?img=9'}
+            />
             <AvatarFallback>{user?.name?.charAt(0) || 'S'}</AvatarFallback>
           </Avatar>
           <div className="flex flex-col overflow-hidden">
-            <span className="text-sm font-semibold leading-none truncate">{user?.name || 'Sarah Smither'}</span>
-            <span className="text-xs text-muted-foreground mt-1 truncate">{user?.email || 'sarahsmith@mail.com'}</span>
+            <span className="text-sm font-semibold leading-none truncate">
+              {user?.name || 'Sarah Smither'}
+            </span>
+            <span className="text-xs text-muted-foreground mt-1 truncate">
+              {user?.email || 'sarahsmith@mail.com'}
+            </span>
           </div>
         </div>
-        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 text-muted-foreground"
+        >
           <PanelLeftClose className="h-5 w-5" />
         </Button>
       </div>
@@ -58,7 +82,8 @@ export function Sidebar() {
       <div className="flex-1 overflow-y-auto px-3 py-2 scrollbar-thin">
         <nav className="space-y-0.5">
           {navigation.map((item) => {
-            const isActive = pathname.startsWith(item.href) || pathname === item.href;
+            const isActive =
+              pathname.startsWith(item.href) || pathname === item.href;
             return (
               <Link
                 key={item.name}
@@ -67,7 +92,7 @@ export function Sidebar() {
                   'flex items-center justify-between rounded-xl px-3 py-2.5 text-sm transition-colors font-medium',
                   isActive
                     ? 'bg-secondary text-foreground'
-                    : 'text-muted-foreground hover:bg-secondary/50 hover:text-foreground'
+                    : 'text-muted-foreground hover:bg-secondary/50 hover:text-foreground',
                 )}
               >
                 <div className="flex items-center gap-3">
@@ -75,7 +100,10 @@ export function Sidebar() {
                   {item.name}
                 </div>
                 {item.count && (
-                  <Badge variant="outline" className="h-5 rounded-md px-1.5 text-xs font-normal border-none bg-secondary text-muted-foreground">
+                  <Badge
+                    variant="outline"
+                    className="h-5 rounded-md px-1.5 text-xs font-normal border-none bg-secondary text-muted-foreground"
+                  >
                     {item.count}
                   </Badge>
                 )}
@@ -89,10 +117,18 @@ export function Sidebar() {
           <div className="flex items-center justify-between text-xs font-semibold text-muted-foreground mb-3 px-1">
             <span>Favourite</span>
             <div className="flex items-center">
-              <Button variant="ghost" size="icon" className="h-5 w-5 text-muted-foreground hover:text-foreground">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-5 w-5 text-muted-foreground hover:text-foreground"
+              >
                 <MoreHorizontal className="h-3 w-3" />
               </Button>
-              <Button variant="ghost" size="icon" className="h-5 w-5 text-muted-foreground hover:text-foreground">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-5 w-5 text-muted-foreground hover:text-foreground"
+              >
                 <Plus className="h-3 w-3" />
               </Button>
             </div>

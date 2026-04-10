@@ -6,7 +6,9 @@ import type { AnalyzeTaskReportInput } from '@/shared/types/api/ai-agent';
 
 export function useSubmitTaskReport() {
   return useMutation({
-    mutationFn: async (args: { taskId: string; input: AnalyzeTaskReportInput }) =>
-      aiAgentApi.submitTaskReport(args.taskId, args.input),
+    mutationFn: async (args: {
+      taskId: string;
+      input: AnalyzeTaskReportInput;
+    }) => aiAgentApi.submitTaskReport(args.taskId, args.input),
   });
 }

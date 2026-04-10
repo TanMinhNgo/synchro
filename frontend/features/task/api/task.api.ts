@@ -1,11 +1,17 @@
 import { apiClient } from '@/shared/api/client';
 import type { MongoIdLike } from '@/shared/types/api/project';
-import type { CreateTaskInput, Task, TransitionTaskInput, UpdateTaskInput } from '@/shared/types/api/task';
+import type {
+  CreateTaskInput,
+  Task,
+  TransitionTaskInput,
+  UpdateTaskInput,
+} from '@/shared/types/api/task';
 
 function normalizeId<T extends MongoIdLike & Record<string, unknown>>(
   obj: T,
 ): T & { id: string } {
-  const idValue = (obj as { id?: unknown }).id ?? (obj as { _id?: unknown })._id;
+  const idValue =
+    (obj as { id?: unknown }).id ?? (obj as { _id?: unknown })._id;
   if (typeof idValue !== 'string' || !idValue) {
     throw new Error('Invalid payload: missing id');
   }
@@ -16,10 +22,14 @@ function normalizeTask(obj: Record<string, unknown> & MongoIdLike): Task {
   const withId = normalizeId(obj) as Record<string, unknown> & { id: string };
 
   const legacyAssigneeId =
-    typeof withId.assigneeId === 'string' && withId.assigneeId ? withId.assigneeId : undefined;
+    typeof withId.assigneeId === 'string' && withId.assigneeId
+      ? withId.assigneeId
+      : undefined;
 
   const assigneeIds = Array.isArray(withId.assigneeIds)
-    ? (withId.assigneeIds.filter((v) => typeof v === 'string' && v.length > 0) as string[])
+    ? (withId.assigneeIds.filter(
+        (v) => typeof v === 'string' && v.length > 0,
+      ) as string[])
     : legacyAssigneeId
       ? [legacyAssigneeId]
       : [];
@@ -35,7 +45,8 @@ function normalizeTask(obj: Record<string, unknown> & MongoIdLike): Task {
         )
         .map((a) => ({
           url: String((a as { url: string }).url),
-          ...(typeof (a as { title?: unknown }).title === 'string' && (a as { title: string }).title
+          ...(typeof (a as { title?: unknown }).title === 'string' &&
+          (a as { title: string }).title
             ? { title: String((a as { title: string }).title) }
             : {}),
         })) as Task['attachments'])
@@ -64,8 +75,12 @@ export const taskApi = {
       },
     });
 
-    const items = Array.isArray(res.data) ? (res.data as Array<Record<string, unknown>>) : [];
-    return items.map((t) => normalizeTask(t as Record<string, unknown> & MongoIdLike));
+    const items = Array.isArray(res.data)
+      ? (res.data as Array<Record<string, unknown>>)
+      : [];
+    return items.map((t) =>
+      normalizeTask(t as Record<string, unknown> & MongoIdLike),
+    );
   },
 
   async createTask(projectId: string, input: CreateTaskInput): Promise<Task> {
@@ -83,7 +98,10 @@ export const taskApi = {
     return normalizeTask(res.data as Record<string, unknown> & MongoIdLike);
   },
 
-  async transitionTask(taskId: string, input: TransitionTaskInput): Promise<Task> {
+  async transitionTask(
+    taskId: string,
+    input: TransitionTaskInput,
+  ): Promise<Task> {
     const res = await apiClient.post(`/tasks/${taskId}/transition`, input);
     return normalizeTask(res.data as Record<string, unknown> & MongoIdLike);
   },

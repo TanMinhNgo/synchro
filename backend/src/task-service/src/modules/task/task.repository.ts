@@ -3,7 +3,9 @@ import { Model } from 'mongoose';
 import { Task } from './schemas/task.schema';
 
 export class TaskRepository {
-  constructor(@InjectModel(Task.name) private readonly taskModel: Model<Task>) {}
+  constructor(
+    @InjectModel(Task.name) private readonly taskModel: Model<Task>,
+  ) {}
 
   createTask(data: Task) {
     return this.taskModel.create(data);
@@ -32,7 +34,9 @@ export class TaskRepository {
   }
 
   updateTask(taskId: string, patch: Partial<Task>) {
-    return this.taskModel.findByIdAndUpdate(taskId, patch, { new: true }).lean();
+    return this.taskModel
+      .findByIdAndUpdate(taskId, patch, { new: true })
+      .lean();
   }
 
   deleteTask(taskId: string) {

@@ -40,15 +40,22 @@ export function useCreateTask(options?: {
         priority: input.priority,
         ...(input.assigneeIds ? { assigneeIds: input.assigneeIds } : {}),
         ...(input.dueDate ? { dueDate: input.dueDate } : {}),
-        ...(input.subtasks && input.subtasks.length > 0 ? { subtasks: input.subtasks } : {}),
-        ...(input.attachments && input.attachments.length > 0 ? { attachments: input.attachments } : {}),
+        ...(input.subtasks && input.subtasks.length > 0
+          ? { subtasks: input.subtasks }
+          : {}),
+        ...(input.attachments && input.attachments.length > 0
+          ? { attachments: input.attachments }
+          : {}),
       });
     },
     onSuccess: (created) => {
       const key = options?.listQueryKey;
       const shouldAdd = options?.shouldAddToList ?? (() => true);
       if (key && shouldAdd(created)) {
-        queryClient.setQueryData<Task[]>(key, (prev) => [created, ...(prev ?? [])]);
+        queryClient.setQueryData<Task[]>(key, (prev) => [
+          created,
+          ...(prev ?? []),
+        ]);
         void queryClient.invalidateQueries({ queryKey: key });
       }
       options?.onSuccess?.(created);

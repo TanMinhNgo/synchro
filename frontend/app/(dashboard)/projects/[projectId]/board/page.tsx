@@ -19,20 +19,25 @@ export default function ProjectBoardPage({
   params: Promise<{ projectId: string }>;
 }) {
   const { projectId } = React.use(params);
-  const { projectQuery, boardsQuery, boardId, columnsQuery, tasksQuery } = useProjectBoardData(projectId);
+  const { projectQuery, boardsQuery, boardId, columnsQuery, tasksQuery } =
+    useProjectBoardData(projectId);
 
   const projectName = projectQuery.data?.name ?? `Project ${projectId}`;
   const columns = columnsQuery.data ?? [];
   const tasks = tasksQuery.data;
 
-  const [createColumnKey, setCreateColumnKey] = React.useState<ProjectColumnKey | null>(null);
+  const [createColumnKey, setCreateColumnKey] =
+    React.useState<ProjectColumnKey | null>(null);
   const [editingTask, setEditingTask] = React.useState<Task | null>(null);
   const [deletingTask, setDeletingTask] = React.useState<Task | null>(null);
 
   const createDefaultBoardMutation = useCreateDefaultBoard(projectId);
-  const createDefaultColumnsMutation = useCreateDefaultColumns(projectId, boardId);
+  const createDefaultColumnsMutation = useCreateDefaultColumns(
+    projectId,
+    boardId,
+  );
   const isCreateOpen = createColumnKey !== null;
-  
+
   return (
     <div className="flex h-full flex-col gap-4 overflow-hidden">
       <ProjectBoardHeader projectName={projectName} />
@@ -41,52 +46,69 @@ export default function ProjectBoardPage({
         <div className="text-sm text-muted-foreground">Loading board…</div>
       )}
 
-      {(projectQuery.isError || boardsQuery.isError || columnsQuery.isError || tasksQuery.isError) && (
+      {(projectQuery.isError ||
+        boardsQuery.isError ||
+        columnsQuery.isError ||
+        tasksQuery.isError) && (
         <div className="text-sm text-destructive">
           Failed to load board data.
         </div>
       )}
 
-      {!boardsQuery.isLoading && boardsQuery.data && boardsQuery.data.length === 0 && (
-        <div className="rounded-lg border border-dashed p-4 text-sm">
-          <div className="text-muted-foreground">This project has no boards yet.</div>
-          <div className="mt-3 flex items-center gap-2">
-            <Button
-              size="sm"
-              onClick={() => createDefaultBoardMutation.mutate()}
-              disabled={createDefaultBoardMutation.isPending}
-            >
-              {createDefaultBoardMutation.isPending ? 'Creating…' : 'Create board'}
-            </Button>
-            {createDefaultBoardMutation.isError && (
-              <div className="text-sm text-destructive">
-                {(createDefaultBoardMutation.error as Error)?.message ?? 'Failed to create board.'}
-              </div>
-            )}
+      {!boardsQuery.isLoading &&
+        boardsQuery.data &&
+        boardsQuery.data.length === 0 && (
+          <div className="rounded-lg border border-dashed p-4 text-sm">
+            <div className="text-muted-foreground">
+              This project has no boards yet.
+            </div>
+            <div className="mt-3 flex items-center gap-2">
+              <Button
+                size="sm"
+                onClick={() => createDefaultBoardMutation.mutate()}
+                disabled={createDefaultBoardMutation.isPending}
+              >
+                {createDefaultBoardMutation.isPending
+                  ? 'Creating…'
+                  : 'Create board'}
+              </Button>
+              {createDefaultBoardMutation.isError && (
+                <div className="text-sm text-destructive">
+                  {(createDefaultBoardMutation.error as Error)?.message ??
+                    'Failed to create board.'}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {!columnsQuery.isLoading && boardId && columnsQuery.data && columnsQuery.data.length === 0 && (
-        <div className="rounded-lg border border-dashed p-4 text-sm">
-          <div className="text-muted-foreground">This board has no columns yet.</div>
-          <div className="mt-3 flex items-center gap-2">
-            <Button
-              size="sm"
-              onClick={() => createDefaultColumnsMutation.mutate()}
-              disabled={createDefaultColumnsMutation.isPending}
-            >
-              {createDefaultColumnsMutation.isPending ? 'Creating…' : 'Create default columns'}
-            </Button>
-            {createDefaultColumnsMutation.isError && (
-              <div className="text-sm text-destructive">
-                {(createDefaultColumnsMutation.error as Error)?.message ??
-                  'Failed to create columns.'}
-              </div>
-            )}
+      {!columnsQuery.isLoading &&
+        boardId &&
+        columnsQuery.data &&
+        columnsQuery.data.length === 0 && (
+          <div className="rounded-lg border border-dashed p-4 text-sm">
+            <div className="text-muted-foreground">
+              This board has no columns yet.
+            </div>
+            <div className="mt-3 flex items-center gap-2">
+              <Button
+                size="sm"
+                onClick={() => createDefaultColumnsMutation.mutate()}
+                disabled={createDefaultColumnsMutation.isPending}
+              >
+                {createDefaultColumnsMutation.isPending
+                  ? 'Creating…'
+                  : 'Create default columns'}
+              </Button>
+              {createDefaultColumnsMutation.isError && (
+                <div className="text-sm text-destructive">
+                  {(createDefaultColumnsMutation.error as Error)?.message ??
+                    'Failed to create columns.'}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
       <ProjectBoardKanban
         projectName={projectName}

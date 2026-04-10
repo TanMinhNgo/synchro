@@ -5,9 +5,7 @@ import type { CreateTaskDto } from '@/contracts/task/dto/create-task.dto';
 import type { TransitionTaskDto } from '@/contracts/task/dto/transition-task.dto';
 import type { UpdateTaskDto } from '@/contracts/task/dto/update-task.dto';
 import { taskServiceSubjects } from '@/contracts/task/task.subjects';
-import {
-  TASK_SERVICE_NATS_CLIENT,
-} from './task-service.nats';
+import { TASK_SERVICE_NATS_CLIENT } from './task-service.nats';
 
 @Injectable()
 export class TaskServiceClient {

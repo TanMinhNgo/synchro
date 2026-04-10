@@ -5,7 +5,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { io } from 'socket.io-client';
 
 function getNotificationSocketUrl() {
-  const rawApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
+  const rawApiUrl =
+    process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
   return rawApiUrl.replace(/\/+api\/?$/, '');
 }
 

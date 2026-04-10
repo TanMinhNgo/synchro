@@ -22,12 +22,26 @@ import type { ProjectColumnKey } from '@/shared/types/api/project';
 import type { Task } from '@/shared/types/api/task';
 import { calcProgress, countSubtasks, formatDeadline } from './task-utils';
 
-type Column = { id: string; key: ProjectColumnKey; name: string; order?: number | null };
+type Column = {
+  id: string;
+  key: ProjectColumnKey;
+  name: string;
+  order?: number | null;
+};
 
-function DroppableArea({ id, children }: { id: string; children: React.ReactNode }) {
+function DroppableArea({
+  id,
+  children,
+}: {
+  id: string;
+  children: React.ReactNode;
+}) {
   const { setNodeRef, isOver } = useDroppable({ id });
   return (
-    <div ref={setNodeRef} className={isOver ? 'rounded-xl ring-1 ring-ring/40' : undefined}>
+    <div
+      ref={setNodeRef}
+      className={isOver ? 'rounded-xl ring-1 ring-ring/40' : undefined}
+    >
       {children}
     </div>
   );
@@ -42,10 +56,11 @@ function DraggableTask({
   data: { taskId: string; columnKey: ProjectColumnKey };
   children: (args: { isDragging: boolean }) => React.ReactNode;
 }) {
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-    id,
-    data,
-  });
+  const { attributes, listeners, setNodeRef, transform, isDragging } =
+    useDraggable({
+      id,
+      data,
+    });
 
   const style: React.CSSProperties = {
     transform: CSS.Translate.toString(transform),
@@ -121,7 +136,9 @@ export function ProjectBoardKanban({
       if (!overId.startsWith('column:')) return;
 
       const nextColumnKey = overId.replace('column:', '') as ProjectColumnKey;
-      const activeData = event.active.data.current as { taskId: string; columnKey: ProjectColumnKey } | undefined;
+      const activeData = event.active.data.current as
+        | { taskId: string; columnKey: ProjectColumnKey }
+        | undefined;
       if (!activeData?.taskId) return;
       if (activeData.columnKey === nextColumnKey) return;
 
@@ -134,7 +151,10 @@ export function ProjectBoardKanban({
         }
       }
 
-      transitionTaskMutation.mutate({ taskId: activeData.taskId, nextColumnKey });
+      transitionTaskMutation.mutate({
+        taskId: activeData.taskId,
+        nextColumnKey,
+      });
     },
     [tasks, transitionTaskMutation],
   );
@@ -167,7 +187,11 @@ export function ProjectBoardKanban({
                 onAdd={() => onAdd(col.key)}
               >
                 {colTasks.map((t) => (
-                  <DraggableTask key={t.id} id={`task:${t.id}`} data={{ taskId: t.id, columnKey: t.columnKey }}>
+                  <DraggableTask
+                    key={t.id}
+                    id={`task:${t.id}`}
+                    data={{ taskId: t.id, columnKey: t.columnKey }}
+                  >
                     {({ isDragging }) => (
                       <TaskCard
                         projectTitle={projectName}

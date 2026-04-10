@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import type { CreateTaskDto } from '@/contracts/task/dto/create-task.dto';
 import type { TransitionTaskDto } from '@/contracts/task/dto/transition-task.dto';
@@ -18,9 +22,12 @@ function normalizeAssigneeIds(dto: {
   assigneeId?: unknown;
 }): string[] {
   if (Array.isArray(dto.assigneeIds)) {
-    return dto.assigneeIds.filter((v): v is string => typeof v === 'string' && v.length > 0);
+    return dto.assigneeIds.filter(
+      (v): v is string => typeof v === 'string' && v.length > 0,
+    );
   }
-  if (typeof dto.assigneeId === 'string' && dto.assigneeId) return [dto.assigneeId];
+  if (typeof dto.assigneeId === 'string' && dto.assigneeId)
+    return [dto.assigneeId];
   return [];
 }
 
@@ -50,7 +57,10 @@ export class TaskService {
     const assigneeIds = normalizeAssigneeIds(dto);
     const attachments = (dto.attachments ?? [])
       .filter((a) => a && typeof a.url === 'string' && a.url.trim().length > 0)
-      .map((a) => ({ url: a.url.trim(), ...(a.title ? { title: a.title.trim() } : {}) }));
+      .map((a) => ({
+        url: a.url.trim(),
+        ...(a.title ? { title: a.title.trim() } : {}),
+      }));
 
     const task = await this.repo.createTask({
       projectId,
@@ -80,7 +90,9 @@ export class TaskService {
   async updateTask(taskId: string, dto: UpdateTaskDto) {
     const patch: any = {
       ...(dto.title !== undefined ? { title: dto.title } : {}),
-      ...(dto.description !== undefined ? { description: dto.description } : {}),
+      ...(dto.description !== undefined
+        ? { description: dto.description }
+        : {}),
       ...(dto.dueDate !== undefined ? { dueDate: new Date(dto.dueDate) } : {}),
       ...(dto.priority !== undefined ? { priority: dto.priority } : {}),
       ...(dto.columnKey !== undefined ? { columnKey: dto.columnKey } : {}),
@@ -118,7 +130,9 @@ export class TaskService {
 
     if (dto.attachments !== undefined) {
       const attachments = (dto.attachments ?? [])
-        .filter((a) => a && typeof a.url === 'string' && a.url.trim().length > 0)
+        .filter(
+          (a) => a && typeof a.url === 'string' && a.url.trim().length > 0,
+        )
         .map((a) => ({
           url: a.url!.trim(),
           ...(a.title ? { title: a.title.trim() } : {}),
@@ -131,7 +145,9 @@ export class TaskService {
       if (!current) throw new NotFoundException('Task not found');
 
       const nextSubtasks: Subtask[] | undefined =
-        patch.subtasks !== undefined ? (patch.subtasks as Subtask[]) : (current as any).subtasks;
+        patch.subtasks !== undefined
+          ? (patch.subtasks as Subtask[])
+          : (current as any).subtasks;
 
       if (!canMarkDone(nextSubtasks)) {
         throw new BadRequestException(
@@ -158,7 +174,9 @@ export class TaskService {
       }
     }
 
-    const updated = await this.repo.updateTask(taskId, { columnKey: dto.columnKey });
+    const updated = await this.repo.updateTask(taskId, {
+      columnKey: dto.columnKey,
+    });
     if (!updated) throw new NotFoundException('Task not found');
     return updated;
   }

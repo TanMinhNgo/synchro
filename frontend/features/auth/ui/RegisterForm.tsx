@@ -8,7 +8,14 @@ import { useRegister } from '../hooks/useRegister';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from '@/components/ui/card';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -32,7 +39,9 @@ export function RegisterForm() {
         router.push('/dashboard');
       },
       onError: (error) => {
-        toast.error(error instanceof Error ? error.message : 'Registration failed');
+        toast.error(
+          error instanceof Error ? error.message : 'Registration failed',
+        );
       },
     });
   };
@@ -41,18 +50,18 @@ export function RegisterForm() {
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
         <CardTitle>Create an account</CardTitle>
-        <CardDescription>Enter your details below to create your account.</CardDescription>
+        <CardDescription>
+          Enter your details below to create your account.
+        </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Full Name</Label>
-            <Input
-              id="name"
-              placeholder="John Doe"
-              {...register('name')}
-            />
-            {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
+            <Input id="name" placeholder="John Doe" {...register('name')} />
+            {errors.name && (
+              <p className="text-sm text-red-500">{errors.name.message}</p>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
@@ -62,7 +71,9 @@ export function RegisterForm() {
               placeholder="name@example.com"
               {...register('email')}
             />
-            {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
+            {errors.email && (
+              <p className="text-sm text-red-500">{errors.email.message}</p>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
@@ -72,7 +83,9 @@ export function RegisterForm() {
               placeholder="••••••••"
               {...register('password')}
             />
-            {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
+            {errors.password && (
+              <p className="text-sm text-red-500">{errors.password.message}</p>
+            )}
           </div>
           <div className="space-y-2 mb-4">
             <Label htmlFor="confirmPassword">Confirm Password</Label>
@@ -82,12 +95,22 @@ export function RegisterForm() {
               placeholder="••••••••"
               {...register('confirmPassword')}
             />
-            {errors.confirmPassword && <p className="text-sm text-red-500">{errors.confirmPassword.message}</p>}
+            {errors.confirmPassword && (
+              <p className="text-sm text-red-500">
+                {errors.confirmPassword.message}
+              </p>
+            )}
           </div>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
-          <Button type="submit" className="w-full" disabled={registerMutation.isPending}>
-            {registerMutation.isPending ? 'Creating account...' : 'Create account'}
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={registerMutation.isPending}
+          >
+            {registerMutation.isPending
+              ? 'Creating account...'
+              : 'Create account'}
           </Button>
           <div className="text-sm text-center text-muted-foreground">
             Already have an account?{' '}

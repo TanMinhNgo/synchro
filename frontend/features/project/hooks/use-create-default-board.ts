@@ -35,7 +35,9 @@ export function useCreateDefaultBoard(projectId: string) {
       return board;
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['projects', projectId, 'boards'] });
+      await queryClient.invalidateQueries({
+        queryKey: ['projects', projectId, 'boards'],
+      });
     },
   });
 }

@@ -1,7 +1,11 @@
 'use client';
 
 import * as React from 'react';
-import { StreamChat, type Channel as StreamChannel, type Event } from 'stream-chat';
+import {
+  StreamChat,
+  type Channel as StreamChannel,
+  type Event,
+} from 'stream-chat';
 
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -14,7 +18,10 @@ function formatTime(value?: string | Date) {
   if (!value) return '';
   const d = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(d.getTime())) return '';
-  return d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+  return d.toLocaleTimeString(undefined, {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 }
 
 export default function ChatPage() {
@@ -107,7 +114,9 @@ export default function ChatPage() {
   if (!client) {
     return (
       <Card className="p-6">
-        <div className="text-sm text-muted-foreground">Chat is not connected.</div>
+        <div className="text-sm text-muted-foreground">
+          Chat is not connected.
+        </div>
       </Card>
     );
   }
@@ -120,7 +129,9 @@ export default function ChatPage() {
         <div className="flex items-center justify-between gap-3">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Chat</h1>
-            <p className="text-muted-foreground">Message other members in real time.</p>
+            <p className="text-muted-foreground">
+              Message other members in real time.
+            </p>
           </div>
           <Button
             type="button"
@@ -138,30 +149,51 @@ export default function ChatPage() {
       <Card className="h-[calc(100vh-220px)] overflow-hidden flex flex-col">
         <div className="border-b px-4 py-3">
           <div className="text-sm font-semibold">General</div>
-          <div className="text-xs text-muted-foreground">Everyone who opens Chat joins this room.</div>
+          <div className="text-xs text-muted-foreground">
+            Everyone who opens Chat joins this room.
+          </div>
         </div>
 
         <ScrollArea className="flex-1">
           <div className="p-4 space-y-3">
             {messages.length === 0 ? (
-              <div className="text-sm text-muted-foreground">No messages yet.</div>
+              <div className="text-sm text-muted-foreground">
+                No messages yet.
+              </div>
             ) : (
               messages.map((m, idx) => {
-                const mine = m.user?.id && tokenQuery.data?.user.id && m.user.id === tokenQuery.data.user.id;
+                const mine =
+                  m.user?.id &&
+                  tokenQuery.data?.user.id &&
+                  m.user.id === tokenQuery.data.user.id;
                 return (
                   <div
                     key={m.id}
-                    ref={idx === messages.length - 1 ? lastMessageRef : undefined}
+                    ref={
+                      idx === messages.length - 1 ? lastMessageRef : undefined
+                    }
                     className={mine ? 'flex justify-end' : 'flex justify-start'}
                   >
-                    <div className={mine ? 'max-w-[70%] rounded-xl bg-secondary px-3 py-2' : 'max-w-[70%] rounded-xl border px-3 py-2'}>
+                    <div
+                      className={
+                        mine
+                          ? 'max-w-[70%] rounded-xl bg-secondary px-3 py-2'
+                          : 'max-w-[70%] rounded-xl border px-3 py-2'
+                      }
+                    >
                       <div className="flex items-center justify-between gap-2">
                         <div className="text-xs font-medium text-muted-foreground truncate">
-                          {mine ? 'You' : (m.user?.name ?? m.user?.id ?? 'Unknown')}
+                          {mine
+                            ? 'You'
+                            : (m.user?.name ?? m.user?.id ?? 'Unknown')}
                         </div>
-                        <div className="text-[11px] text-muted-foreground">{formatTime(m.created_at)}</div>
+                        <div className="text-[11px] text-muted-foreground">
+                          {formatTime(m.created_at)}
+                        </div>
                       </div>
-                      <div className="text-sm whitespace-pre-wrap wrap-break-word">{m.text ?? ''}</div>
+                      <div className="text-sm whitespace-pre-wrap wrap-break-word">
+                        {m.text ?? ''}
+                      </div>
                     </div>
                   </div>
                 );
@@ -181,7 +213,11 @@ export default function ChatPage() {
             await channel.sendMessage({ text: value });
           }}
         >
-          <Input value={text} onChange={(e) => setText(e.target.value)} placeholder="Type a message…" />
+          <Input
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Type a message…"
+          />
           <Button type="submit" disabled={!channel || !text.trim()}>
             Send
           </Button>

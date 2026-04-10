@@ -50,7 +50,9 @@ export function useMyTasksKanban() {
   const items = useMemo<MyTaskItem[]>(() => {
     if (!userId || projectList.length === 0) return [];
 
-    const projectNameById = new Map(projectList.map((p) => [p.id, p.name] as const));
+    const projectNameById = new Map(
+      projectList.map((p) => [p.id, p.name] as const),
+    );
 
     const merged: MyTaskItem[] = [];
     for (let i = 0; i < taskQueries.length; i++) {

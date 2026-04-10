@@ -82,9 +82,10 @@ export class AiAgentService {
 
     const now = dto.submittedAt ? new Date(dto.submittedAt) : new Date();
     const reportWordCount = this.countWords(dto.reportText);
-    const taskProgressFromSubtasks = task.subtasksTotal > 0
-      ? Math.round((task.subtasksDone / task.subtasksTotal) * 100)
-      : undefined;
+    const taskProgressFromSubtasks =
+      task.subtasksTotal > 0
+        ? Math.round((task.subtasksDone / task.subtasksTotal) * 100)
+        : undefined;
 
     const issues: ReviewIssue[] = [];
 
@@ -92,11 +93,15 @@ export class AiAgentService {
       issues.push({
         code: 'REPORT_TOO_SHORT',
         severity: 'medium',
-        message: 'Report is too short. Add concrete outcomes, impact, and next steps.',
+        message:
+          'Report is too short. Add concrete outcomes, impact, and next steps.',
       });
     }
 
-    if (dto.progressPercent !== undefined && taskProgressFromSubtasks !== undefined) {
+    if (
+      dto.progressPercent !== undefined &&
+      taskProgressFromSubtasks !== undefined
+    ) {
       const delta = Math.abs(dto.progressPercent - taskProgressFromSubtasks);
       if (delta >= 30) {
         issues.push({
@@ -143,7 +148,8 @@ export class AiAgentService {
       issues.push({
         code: 'INCONSISTENT_HOURS',
         severity: 'low',
-        message: 'Reported progress exists while worked hours is 0. Confirm time tracking.',
+        message:
+          'Reported progress exists while worked hours is 0. Confirm time tracking.',
       });
     }
 
@@ -180,26 +186,30 @@ export class AiAgentService {
 
     if (notifyInInbox) {
       const recipients = this.collectRecipients(task, actorUserId);
-      const title = finalVerdict === 'needs_fix'
-        ? 'AI review: Task report needs updates'
-        : 'AI review: Task report looks good';
-      const message = finalVerdict === 'needs_fix'
-        ? `Task "${task.title}" has ${finalIssues.length} issue(s). Score ${finalScore}/100.`
-        : `Task "${task.title}" report is reasonable. Score ${finalScore}/100.`;
+      const title =
+        finalVerdict === 'needs_fix'
+          ? 'AI review: Task report needs updates'
+          : 'AI review: Task report looks good';
+      const message =
+        finalVerdict === 'needs_fix'
+          ? `Task "${task.title}" has ${finalIssues.length} issue(s). Score ${finalScore}/100.`
+          : `Task "${task.title}" report is reasonable. Score ${finalScore}/100.`;
 
       const settled = await Promise.allSettled(
-        recipients.map((recipientId) => this.notifications.create(recipientId, {
-          type: 'AI_TASK_REPORT_REVIEW',
-          title,
-          message,
-          data: {
-            taskId,
-            verdict: finalVerdict,
-            score: finalScore,
-            issues: finalIssues,
-            llmSummary: llmReview?.summary,
-          },
-        })),
+        recipients.map((recipientId) =>
+          this.notifications.create(recipientId, {
+            type: 'AI_TASK_REPORT_REVIEW',
+            title,
+            message,
+            data: {
+              taskId,
+              verdict: finalVerdict,
+              score: finalScore,
+              issues: finalIssues,
+              llmSummary: llmReview?.summary,
+            },
+          }),
+        ),
       );
 
       settled.forEach((s, idx) => {
@@ -231,7 +241,9 @@ export class AiAgentService {
       ...(dto.progressPercent !== undefined
         ? { progressPercent: dto.progressPercent }
         : {}),
-      ...(dto.workedHours !== undefined ? { workedHours: dto.workedHours } : {}),
+      ...(dto.workedHours !== undefined
+        ? { workedHours: dto.workedHours }
+        : {}),
       ...(dto.blockers ? { blockers: dto.blockers } : {}),
       ...(dto.nextActions ? { nextActions: dto.nextActions } : {}),
       verdict: result.verdict,
@@ -274,13 +286,19 @@ export class AiAgentService {
       query.score = {
         ...(hasMinScore
           ? {
-            $gte: Math.max(0, Math.min(100, Math.floor(options?.minScore as number))),
-          }
+              $gte: Math.max(
+                0,
+                Math.min(100, Math.floor(options?.minScore as number)),
+              ),
+            }
           : {}),
         ...(hasMaxScore
           ? {
-            $lte: Math.max(0, Math.min(100, Math.floor(options?.maxScore as number))),
-          }
+              $lte: Math.max(
+                0,
+                Math.min(100, Math.floor(options?.maxScore as number)),
+              ),
+            }
           : {}),
       };
     }
@@ -356,32 +374,47 @@ export class AiAgentService {
       return t.dueDate.getTime() < now;
     }).length;
 
-    const inProgressTasks = tasks.filter((t) => t.columnKey === 'in_progress').length;
+    const inProgressTasks = tasks.filter(
+      (t) => t.columnKey === 'in_progress',
+    ).length;
 
-    const byAssignee = new Map<string, { total: number; overdue: number; done: number }>();
+    const byAssignee = new Map<
+      string,
+      { total: number; overdue: number; done: number }
+    >();
     tasks.forEach((t) => {
-      const assignees = t.assigneeIds.length > 0 ? t.assigneeIds : ['unassigned'];
+      const assignees =
+        t.assigneeIds.length > 0 ? t.assigneeIds : ['unassigned'];
       assignees.forEach((assigneeId) => {
-        const current = byAssignee.get(assigneeId) ?? { total: 0, overdue: 0, done: 0 };
+        const current = byAssignee.get(assigneeId) ?? {
+          total: 0,
+          overdue: 0,
+          done: 0,
+        };
         current.total += 1;
         if (t.columnKey === 'done') current.done += 1;
-        if (t.dueDate && t.dueDate.getTime() < now && t.columnKey !== 'done') current.overdue += 1;
+        if (t.dueDate && t.dueDate.getTime() < now && t.columnKey !== 'done')
+          current.overdue += 1;
         byAssignee.set(assigneeId, current);
       });
     });
 
-    const assigneeStats = Array.from(byAssignee.entries()).map(([assigneeId, stat]) => ({
-      assigneeId,
-      ...stat,
-    }));
+    const assigneeStats = Array.from(byAssignee.entries()).map(
+      ([assigneeId, stat]) => ({
+        assigneeId,
+        ...stat,
+      }),
+    );
 
     const riskyTasks = tasks
       .filter((t) => t.columnKey !== 'done')
       .map((t) => {
         const reasons: string[] = [];
         if (t.dueDate && t.dueDate.getTime() < now) reasons.push('overdue');
-        if (t.priority === 'urgent' || t.priority === 'high') reasons.push('high_priority');
-        if (t.subtasksTotal > 0 && t.subtasksDone === 0) reasons.push('no_subtask_progress');
+        if (t.priority === 'urgent' || t.priority === 'high')
+          reasons.push('high_priority');
+        if (t.subtasksTotal > 0 && t.subtasksDone === 0)
+          reasons.push('no_subtask_progress');
         return {
           id: t.id,
           title: t.title,
@@ -400,11 +433,17 @@ export class AiAgentService {
         doneTasks,
         inProgressTasks,
         overdueTasks,
-        completionRatePercent: totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0,
+        completionRatePercent:
+          totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0,
       },
       assigneeStats,
       riskyTasks,
-      insights: this.buildProjectInsights(totalTasks, doneTasks, overdueTasks, riskyTasks.length),
+      insights: this.buildProjectInsights(
+        totalTasks,
+        doneTasks,
+        overdueTasks,
+        riskyTasks.length,
+      ),
       generatedAt: new Date().toISOString(),
     };
   }
@@ -421,26 +460,33 @@ export class AiAgentService {
 
     const ranked = dto.candidates
       .map((candidate) => {
-        const activeTasks = tasks.filter((t) =>
-          t.columnKey !== 'done' && t.assigneeIds.includes(candidate.userId)
+        const activeTasks = tasks.filter(
+          (t) =>
+            t.columnKey !== 'done' && t.assigneeIds.includes(candidate.userId),
         ).length;
 
-        const overdueTasks = tasks.filter((t) =>
-          t.columnKey !== 'done' &&
-          t.assigneeIds.includes(candidate.userId) &&
-          t.dueDate &&
-          t.dueDate.getTime() < Date.now()
+        const overdueTasks = tasks.filter(
+          (t) =>
+            t.columnKey !== 'done' &&
+            t.assigneeIds.includes(candidate.userId) &&
+            t.dueDate &&
+            t.dueDate.getTime() < Date.now(),
         ).length;
 
         const capacity = candidate.availableHoursPerWeek ?? 40;
         const load = candidate.currentLoadHours ?? 0;
         const projectedLoad = load + dto.estimatedHours;
 
-        const required = new Set((dto.requiredSkills ?? []).map((s) => s.toLowerCase()));
-        const skills = new Set((candidate.skillTags ?? []).map((s) => s.toLowerCase()));
-        const skillMatch = required.size === 0
-          ? 0
-          : Array.from(required).filter((s) => skills.has(s)).length;
+        const required = new Set(
+          (dto.requiredSkills ?? []).map((s) => s.toLowerCase()),
+        );
+        const skills = new Set(
+          (candidate.skillTags ?? []).map((s) => s.toLowerCase()),
+        );
+        const skillMatch =
+          required.size === 0
+            ? 0
+            : Array.from(required).filter((s) => skills.has(s)).length;
 
         let score = 100;
         score -= activeTasks * 6;
@@ -467,7 +513,10 @@ export class AiAgentService {
     const recommended = ranked[0] ?? null;
     const alternatives = ranked.slice(1, 3);
 
-    const schedule = this.suggestSchedule(dto.estimatedHours, dto.desiredDueDate);
+    const schedule = this.suggestSchedule(
+      dto.estimatedHours,
+      dto.desiredDueDate,
+    );
 
     return {
       projectId,
@@ -501,8 +550,8 @@ export class AiAgentService {
   }
 
   private mergeRecommendations(primary: string[], secondary?: string[]) {
-    const merged = [...primary, ...(secondary ?? [])].filter((x) =>
-      typeof x === 'string' && x.trim().length > 0
+    const merged = [...primary, ...(secondary ?? [])].filter(
+      (x) => typeof x === 'string' && x.trim().length > 0,
     );
     return Array.from(new Set(merged));
   }
@@ -517,7 +566,9 @@ export class AiAgentService {
         return;
       }
 
-      if (this.severityRank(issue.severity) > this.severityRank(current.severity)) {
+      if (
+        this.severityRank(issue.severity) > this.severityRank(current.severity)
+      ) {
         map.set(key, issue);
       }
     });
@@ -525,7 +576,8 @@ export class AiAgentService {
   }
 
   private mergeScore(ruleScore: number, llmScore?: number) {
-    if (typeof llmScore !== 'number' || Number.isNaN(llmScore)) return ruleScore;
+    if (typeof llmScore !== 'number' || Number.isNaN(llmScore))
+      return ruleScore;
     const normalized = Math.max(0, Math.min(100, Math.round(llmScore)));
     return Math.min(ruleScore, normalized);
   }
@@ -571,7 +623,9 @@ export class AiAgentService {
         if (!message) return null;
 
         const severity: RiskSeverity =
-          severityRaw === 'high' || severityRaw === 'medium' || severityRaw === 'low'
+          severityRaw === 'high' ||
+          severityRaw === 'medium' ||
+          severityRaw === 'low'
             ? severityRaw
             : 'medium';
 
@@ -621,8 +675,9 @@ export class AiAgentService {
       recommendations: string[];
     };
   }): Promise<LlmReviewResult | null> {
-    const provider =
-      (this.config.get<string>('AI_REVIEW_PROVIDER') ?? 'none').toLowerCase();
+    const provider = (
+      this.config.get<string>('AI_REVIEW_PROVIDER') ?? 'none'
+    ).toLowerCase();
     if (provider === 'none') return null;
 
     const messages = [
@@ -656,22 +711,24 @@ export class AiAgentService {
       const apiKey = this.config.get<string>('OPENAI_API_KEY');
       if (!apiKey) return null;
 
-      const model =
-        this.config.get<string>('OPENAI_MODEL') ?? 'gpt-4o-mini';
+      const model = this.config.get<string>('OPENAI_MODEL') ?? 'gpt-4o-mini';
 
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${apiKey}`,
+      const response = await fetch(
+        'https://api.openai.com/v1/chat/completions',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${apiKey}`,
+          },
+          body: JSON.stringify({
+            model,
+            temperature: 0.1,
+            response_format: { type: 'json_object' },
+            messages,
+          }),
         },
-        body: JSON.stringify({
-          model,
-          temperature: 0.1,
-          response_format: { type: 'json_object' },
-          messages,
-        }),
-      });
+      );
 
       if (!response.ok) return null;
       const data = (await response.json()) as {
@@ -685,8 +742,7 @@ export class AiAgentService {
       const apiKey = this.config.get<string>('AZURE_OPENAI_API_KEY');
       const deployment = this.config.get<string>('AZURE_OPENAI_DEPLOYMENT');
       const apiVersion =
-        this.config.get<string>('AZURE_OPENAI_API_VERSION') ??
-        '2024-10-21';
+        this.config.get<string>('AZURE_OPENAI_API_VERSION') ?? '2024-10-21';
 
       if (!endpoint || !apiKey || !deployment) return null;
 
@@ -774,13 +830,17 @@ export class AiAgentService {
     insights.push(`Completion rate is ${completion}%.`);
 
     if (overdueTasks > 0) {
-      insights.push(`${overdueTasks} task(s) are overdue and should be prioritized.`);
+      insights.push(
+        `${overdueTasks} task(s) are overdue and should be prioritized.`,
+      );
     } else {
       insights.push('No overdue tasks detected.');
     }
 
     if (riskyTaskCount > 0) {
-      insights.push(`${riskyTaskCount} risky task(s) detected (priority/progress/due-date).`);
+      insights.push(
+        `${riskyTaskCount} risky task(s) detected (priority/progress/due-date).`,
+      );
     }
 
     return insights;
@@ -789,14 +849,18 @@ export class AiAgentService {
   private suggestSchedule(estimatedHours: number, desiredDueDate?: string) {
     const start = new Date();
     const focusHoursPerDay = 4;
-    const neededDays = Math.max(1, Math.ceil(estimatedHours / focusHoursPerDay));
+    const neededDays = Math.max(
+      1,
+      Math.ceil(estimatedHours / focusHoursPerDay),
+    );
     const recommendedDueDate = new Date(start);
     recommendedDueDate.setDate(start.getDate() + neededDays);
 
     const desired = desiredDueDate ? new Date(desiredDueDate) : null;
-    const warning = desired && desired.getTime() < recommendedDueDate.getTime()
-      ? 'Desired due date is earlier than recommended timeline based on effort.'
-      : null;
+    const warning =
+      desired && desired.getTime() < recommendedDueDate.getTime()
+        ? 'Desired due date is earlier than recommended timeline based on effort.'
+        : null;
 
     return {
       suggestedStartDate: start.toISOString(),
@@ -827,14 +891,17 @@ export class AiAgentService {
     if (!projectId) throw new Error('Task payload missing projectId');
 
     const assigneeIdsRaw = Array.isArray(row.assigneeIds)
-      ? row.assigneeIds.filter((x): x is string => typeof x === 'string' && x.length > 0)
+      ? row.assigneeIds.filter(
+          (x): x is string => typeof x === 'string' && x.length > 0,
+        )
       : [];
     const assigneeId = this.pickString(row.assigneeId);
-    const assigneeIds = assigneeIdsRaw.length > 0
-      ? assigneeIdsRaw
-      : assigneeId
-      ? [assigneeId]
-      : [];
+    const assigneeIds =
+      assigneeIdsRaw.length > 0
+        ? assigneeIdsRaw
+        : assigneeId
+          ? [assigneeId]
+          : [];
 
     const subtasks = Array.isArray(row.subtasks) ? row.subtasks : [];
     const subtasksDone = subtasks.filter((s) => {

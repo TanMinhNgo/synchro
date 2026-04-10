@@ -30,12 +30,16 @@ export function BoardColumn({
       <div className="flex items-center justify-between px-2 pt-2">
         <div className="flex items-center gap-2">
           {icon && (
-            <div className={`flex items-center justify-center h-6 w-6 rounded-md ${iconBgColor}`}>
+            <div
+              className={`flex items-center justify-center h-6 w-6 rounded-md ${iconBgColor}`}
+            >
               {icon}
             </div>
           )}
           <h3 className={`font-semibold text-sm ${titleColor}`}>{title}</h3>
-          <span className="text-sm font-medium text-muted-foreground ml-1">{count}</span>
+          <span className="text-sm font-medium text-muted-foreground ml-1">
+            {count}
+          </span>
         </div>
         <div className="flex items-center">
           <Button

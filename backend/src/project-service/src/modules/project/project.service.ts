@@ -20,7 +20,8 @@ export class ProjectService {
 
   private getIdValue(obj: unknown): string {
     if (!obj || typeof obj !== 'object') throw new Error('Invalid payload');
-    const raw = (obj as { id?: unknown; _id?: unknown }).id ??
+    const raw =
+      (obj as { id?: unknown; _id?: unknown }).id ??
       (obj as { id?: unknown; _id?: unknown })._id;
     if (typeof raw === 'string' && raw) return raw;
     if (raw && typeof raw === 'object' && 'toString' in raw) {
@@ -68,7 +69,9 @@ export class ProjectService {
     if (!project) throw new NotFoundException('Project not found');
     this.assertAccess(project, userId);
 
-    const projectId = isValidObjectId(idOrSlug) ? idOrSlug : this.getIdValue(project);
+    const projectId = isValidObjectId(idOrSlug)
+      ? idOrSlug
+      : this.getIdValue(project);
     const ensured = await this.ensureProjectHasSlug(project, projectId);
     return { project: ensured, projectId };
   }
@@ -109,7 +112,11 @@ export class ProjectService {
     return project;
   }
 
-  async updateProject(userId: string, projectId: string, dto: UpdateProjectDto) {
+  async updateProject(
+    userId: string,
+    projectId: string,
+    dto: UpdateProjectDto,
+  ) {
     const { project: existing, projectId: resolvedProjectId } =
       await this.getProjectByIdOrSlug(userId, projectId);
 
@@ -119,7 +126,9 @@ export class ProjectService {
 
     const updated = await this.repo.updateProject(resolvedProjectId, {
       ...(dto.name !== undefined ? { name: dto.name } : {}),
-      ...(dto.description !== undefined ? { description: dto.description } : {}),
+      ...(dto.description !== undefined
+        ? { description: dto.description }
+        : {}),
       ...(dto.memberIds !== undefined ? { memberIds: dto.memberIds } : {}),
       ...(dto.status !== undefined ? { status: dto.status } : {}),
     });
@@ -155,7 +164,11 @@ export class ProjectService {
       description: dto.description,
     });
 
-    const defaults: Array<{ key: ProjectColumnKey; name: string; order: number }> = [
+    const defaults: Array<{
+      key: ProjectColumnKey;
+      name: string;
+      order: number;
+    }> = [
       { key: ProjectColumnKey.backlog, name: 'Backlog', order: 0 },
       { key: ProjectColumnKey.in_progress, name: 'In Progress', order: 1 },
       { key: ProjectColumnKey.in_review, name: 'In Review', order: 2 },

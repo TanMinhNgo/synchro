@@ -1,8 +1,14 @@
-"use client";
+'use client';
 
 import * as React from 'react';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   Table,
   TableBody,
@@ -16,8 +22,14 @@ import type { ProjectColumnKey } from '@/shared/types/api/project';
 import type { TaskPriority } from '@/shared/types/api/task';
 
 export default function ReportingPage() {
-  const { isLoading, isError, items, currentUserQuery, projectsQuery, taskQueries } =
-    useMyTasksKanban();
+  const {
+    isLoading,
+    isError,
+    items,
+    currentUserQuery,
+    projectsQuery,
+    taskQueries,
+  } = useMyTasksKanban();
 
   const tasks = React.useMemo(() => items.map((i) => i.task), [items]);
 
@@ -74,7 +86,10 @@ export default function ReportingPage() {
   }, [now, tasks, upcomingCutoff]);
 
   const totalsByProject = React.useMemo(() => {
-    const map = new Map<string, { projectId: string; projectName: string; total: number; overdue: number }>();
+    const map = new Map<
+      string,
+      { projectId: string; projectName: string; total: number; overdue: number }
+    >();
 
     for (const item of items) {
       const entry = map.get(item.projectId) ?? {
@@ -106,13 +121,17 @@ export default function ReportingPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Reporting</h1>
-        <p className="text-muted-foreground">Insights for your work and projects.</p>
+        <p className="text-muted-foreground">
+          Insights for your work and projects.
+        </p>
       </div>
 
       {isError && (
         <Card className="border-destructive/30">
           <CardHeader>
-            <CardTitle className="text-base">Failed to load reporting</CardTitle>
+            <CardTitle className="text-base">
+              Failed to load reporting
+            </CardTitle>
             <CardDescription>{errorMessage ?? 'Unknown error'}</CardDescription>
           </CardHeader>
         </Card>
@@ -122,15 +141,23 @@ export default function ReportingPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Overview</CardTitle>
-            <CardDescription>Your assigned tasks across projects.</CardDescription>
+            <CardDescription>
+              Your assigned tasks across projects.
+            </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-wrap gap-2">
-            <Badge variant="outline">Total: {isLoading ? '—' : totalTasks}</Badge>
+            <Badge variant="outline">
+              Total: {isLoading ? '—' : totalTasks}
+            </Badge>
             <Badge variant="outline">Open: {isLoading ? '—' : totalOpen}</Badge>
-            <Badge variant={dueBuckets.overdue > 0 ? 'destructive' : 'secondary'}>
+            <Badge
+              variant={dueBuckets.overdue > 0 ? 'destructive' : 'secondary'}
+            >
               Overdue: {isLoading ? '—' : dueBuckets.overdue}
             </Badge>
-            <Badge variant="secondary">Upcoming (7d): {isLoading ? '—' : dueBuckets.upcoming}</Badge>
+            <Badge variant="secondary">
+              Upcoming (7d): {isLoading ? '—' : dueBuckets.upcoming}
+            </Badge>
           </CardContent>
         </Card>
 
@@ -140,11 +167,17 @@ export default function ReportingPage() {
             <CardDescription>Only open tasks are counted.</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-wrap gap-2">
-            <Badge variant={dueBuckets.overdue > 0 ? 'destructive' : 'secondary'}>
+            <Badge
+              variant={dueBuckets.overdue > 0 ? 'destructive' : 'secondary'}
+            >
               Overdue: {isLoading ? '—' : dueBuckets.overdue}
             </Badge>
-            <Badge variant="secondary">Upcoming (7d): {isLoading ? '—' : dueBuckets.upcoming}</Badge>
-            <Badge variant="outline">No due date: {isLoading ? '—' : dueBuckets.noDue}</Badge>
+            <Badge variant="secondary">
+              Upcoming (7d): {isLoading ? '—' : dueBuckets.upcoming}
+            </Badge>
+            <Badge variant="outline">
+              No due date: {isLoading ? '—' : dueBuckets.noDue}
+            </Badge>
           </CardContent>
         </Card>
       </div>
@@ -156,10 +189,18 @@ export default function ReportingPage() {
             <CardDescription>Kanban columns distribution.</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-wrap gap-2">
-            <Badge variant="outline">Backlog: {isLoading ? '—' : countsByStatus.backlog}</Badge>
-            <Badge variant="outline">In progress: {isLoading ? '—' : countsByStatus.in_progress}</Badge>
-            <Badge variant="outline">In review: {isLoading ? '—' : countsByStatus.in_review}</Badge>
-            <Badge variant="secondary">Done: {isLoading ? '—' : countsByStatus.done}</Badge>
+            <Badge variant="outline">
+              Backlog: {isLoading ? '—' : countsByStatus.backlog}
+            </Badge>
+            <Badge variant="outline">
+              In progress: {isLoading ? '—' : countsByStatus.in_progress}
+            </Badge>
+            <Badge variant="outline">
+              In review: {isLoading ? '—' : countsByStatus.in_review}
+            </Badge>
+            <Badge variant="secondary">
+              Done: {isLoading ? '—' : countsByStatus.done}
+            </Badge>
           </CardContent>
         </Card>
 
@@ -169,12 +210,20 @@ export default function ReportingPage() {
             <CardDescription>How your tasks are prioritized.</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-wrap gap-2">
-            <Badge variant={countsByPriority.urgent > 0 ? 'destructive' : 'outline'}>
+            <Badge
+              variant={countsByPriority.urgent > 0 ? 'destructive' : 'outline'}
+            >
               Urgent: {isLoading ? '—' : countsByPriority.urgent}
             </Badge>
-            <Badge variant="outline">High: {isLoading ? '—' : countsByPriority.high}</Badge>
-            <Badge variant="outline">Medium: {isLoading ? '—' : countsByPriority.medium}</Badge>
-            <Badge variant="outline">Low: {isLoading ? '—' : countsByPriority.low}</Badge>
+            <Badge variant="outline">
+              High: {isLoading ? '—' : countsByPriority.high}
+            </Badge>
+            <Badge variant="outline">
+              Medium: {isLoading ? '—' : countsByPriority.medium}
+            </Badge>
+            <Badge variant="outline">
+              Low: {isLoading ? '—' : countsByPriority.low}
+            </Badge>
           </CardContent>
         </Card>
       </div>
@@ -213,7 +262,11 @@ export default function ReportingPage() {
                   <TableCell className="font-medium">{p.projectName}</TableCell>
                   <TableCell>{p.total}</TableCell>
                   <TableCell>
-                    <Badge variant={p.overdue > 0 ? 'destructive' : 'secondary'}>{p.overdue}</Badge>
+                    <Badge
+                      variant={p.overdue > 0 ? 'destructive' : 'secondary'}
+                    >
+                      {p.overdue}
+                    </Badge>
                   </TableCell>
                 </TableRow>
               ))}

@@ -70,7 +70,11 @@ export function useVideoCallParticipants(enabled: boolean, callId: string) {
 
   const participantsQuery = useQuery({
     queryKey: ['chat', 'video-participants', callId, tokenQuery.data?.token],
-    enabled: enabled && Boolean(videoClient) && Boolean(tokenQuery.data) && tokenQuery.isSuccess,
+    enabled:
+      enabled &&
+      Boolean(videoClient) &&
+      Boolean(tokenQuery.data) &&
+      tokenQuery.isSuccess,
     refetchInterval: 3_000,
     staleTime: 0,
     retry: false,
@@ -79,24 +83,33 @@ export function useVideoCallParticipants(enabled: boolean, callId: string) {
         if (!videoClient) return [] as VoiceChatParticipant[];
         if (!tokenQuery.data) return [] as VoiceChatParticipant[];
 
-        const call = videoClient.call(tokenQuery.data.call.type, tokenQuery.data.call.id);
+        const call = videoClient.call(
+          tokenQuery.data.call.type,
+          tokenQuery.data.call.id,
+        );
         const res = await call.queryParticipants({}, { limit: 12 });
 
-        const rows = Array.isArray((res as any)?.participants) ? (res as any).participants : [];
+        const rows = Array.isArray((res as any)?.participants)
+          ? (res as any).participants
+          : [];
 
         const mapped = rows
           .map((p: any) => {
             const u = p?.user ?? null;
-            const id: string | undefined = u?.id ?? p?.user_id ?? p?.userId ?? p?.id ?? undefined;
+            const id: string | undefined =
+              u?.id ?? p?.user_id ?? p?.userId ?? p?.id ?? undefined;
             if (!id) return null;
 
             const name: string = (u?.name ?? u?.id ?? id) as string;
-            const image: string | undefined = u?.image ?? u?.image_url ?? u?.avatar ?? undefined;
+            const image: string | undefined =
+              u?.image ?? u?.image_url ?? u?.avatar ?? undefined;
 
             return {
               id,
               name,
-              avatarUrl: image || `https://i.pravatar.cc/150?u=${encodeURIComponent(id)}`,
+              avatarUrl:
+                image ||
+                `https://i.pravatar.cc/150?u=${encodeURIComponent(id)}`,
             } satisfies VoiceChatParticipant;
           })
           .filter(Boolean) as VoiceChatParticipant[];

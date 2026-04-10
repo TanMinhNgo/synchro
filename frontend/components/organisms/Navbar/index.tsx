@@ -5,7 +5,13 @@ import { useCurrentUser, useLogout } from '@/features/auth';
 import { useVideoCallParticipants } from '@/features/chat';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Share2, MoreHorizontal, ChevronRight, UserPlus } from 'lucide-react';
+import {
+  Search,
+  Share2,
+  MoreHorizontal,
+  ChevronRight,
+  UserPlus,
+} from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { VoiceChat } from '@/components/ui/chat-bubble';
@@ -61,7 +67,8 @@ export function Navbar() {
 
   // Simple formatting for breadcrumb
   const pageName = pathname.split('/').pop()?.replace('-', ' ') || 'Dashboard';
-  const formattedPageName = pageName.charAt(0).toUpperCase() + pageName.slice(1);
+  const formattedPageName =
+    pageName.charAt(0).toUpperCase() + pageName.slice(1);
 
   return (
     <header className="flex h-18 items-center justify-between border-b bg-background px-6 shrink-0">
@@ -71,35 +78,45 @@ export function Navbar() {
         <div className="flex items-center gap-2 text-foreground">
           <div className="flex items-center h-6 px-2 py-1 bg-muted rounded-md gap-1">
             <span className="text-black/70">◫</span>
-            <span>{formattedPageName === 'Tasks' ? 'My Task' : formattedPageName}</span>
+            <span>
+              {formattedPageName === 'Tasks' ? 'My Task' : formattedPageName}
+            </span>
           </div>
         </div>
       </div>
-      
+
       <div className="flex items-center gap-4">
         <div className="relative w-64">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input 
-            type="search" 
-            placeholder="Search task..." 
+          <Input
+            type="search"
+            placeholder="Search task..."
             className="w-full bg-muted/30 pl-9 rounded-full h-9 border-none text-sm focus-visible:ring-1"
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
             onKeyDown={(e) => {
               if (e.key !== 'Enter') return;
               const q = searchValue.trim();
-              router.push(q ? `/tasks?search=${encodeURIComponent(q)}` : '/tasks');
+              router.push(
+                q ? `/tasks?search=${encodeURIComponent(q)}` : '/tasks',
+              );
             }}
           />
         </div>
 
-        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full bg-muted/50">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-9 w-9 rounded-full bg-muted/50"
+        >
           <Share2 className="h-4 w-4 text-muted-foreground" />
         </Button>
 
         <div className="flex items-center gap-3 border-l pl-4 ml-2">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground font-medium">3 min ago</span>
+            <span className="text-xs text-muted-foreground font-medium">
+              3 min ago
+            </span>
             <VoiceChat
               users={callUsers}
               onJoin={() => {
@@ -111,7 +128,11 @@ export function Navbar() {
 
           <Button
             className="h-9 rounded-xl font-medium px-4 gap-2"
-            disabled={!activeProjectIdOrSlug || projectQuery.isLoading || !isProjectOwner}
+            disabled={
+              !activeProjectIdOrSlug ||
+              projectQuery.isLoading ||
+              !isProjectOwner
+            }
             onClick={() => {
               if (!activeProjectIdOrSlug) return;
               if (projectQuery.isLoading) return;
@@ -128,7 +149,11 @@ export function Navbar() {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-9 w-9 border rounded-xl">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 border rounded-xl"
+              >
                 <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
               </Button>
             </DropdownMenuTrigger>
@@ -137,7 +162,9 @@ export function Navbar() {
                 <>
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">{user.name}</p>
+                      <p className="text-sm font-medium leading-none">
+                        {user.name}
+                      </p>
                       <p className="text-xs leading-none text-muted-foreground">
                         {user.email}
                       </p>
@@ -182,7 +209,9 @@ export function Navbar() {
                       setInviteOpen(false);
                     },
                     onError: (err) => {
-                      toast.error(err instanceof Error ? err.message : 'Invite failed');
+                      toast.error(
+                        err instanceof Error ? err.message : 'Invite failed',
+                      );
                     },
                   },
                 );
@@ -212,12 +241,16 @@ export function Navbar() {
                       setInviteOpen(false);
                     },
                     onError: (err) => {
-                      toast.error(err instanceof Error ? err.message : 'Invite failed');
+                      toast.error(
+                        err instanceof Error ? err.message : 'Invite failed',
+                      );
                     },
                   },
                 );
               }}
-              disabled={inviteMutation.isPending || inviteEmail.trim().length === 0}
+              disabled={
+                inviteMutation.isPending || inviteEmail.trim().length === 0
+              }
             >
               {inviteMutation.isPending ? 'Inviting…' : 'Invite'}
             </Button>

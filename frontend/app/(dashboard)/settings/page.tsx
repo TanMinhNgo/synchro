@@ -2,7 +2,13 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -25,7 +31,9 @@ export default function SettingsPage() {
     <div className="space-y-6 max-w-2xl mx-auto">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-        <p className="text-muted-foreground">Manage your account and preferences.</p>
+        <p className="text-muted-foreground">
+          Manage your account and preferences.
+        </p>
       </div>
 
       <Card>
@@ -40,11 +48,21 @@ export default function SettingsPage() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" defaultValue={user?.email} readOnly disabled />
+            <Input
+              id="email"
+              type="email"
+              defaultValue={user?.email}
+              readOnly
+              disabled
+            />
           </div>
           <div className="flex items-center gap-2">
             <Button>Save Changes</Button>
-            <Button variant="destructive" onClick={onLogout} disabled={logout.isPending}>
+            <Button
+              variant="destructive"
+              onClick={onLogout}
+              disabled={logout.isPending}
+            >
               {logout.isPending ? 'Logging out…' : 'Log out'}
             </Button>
           </div>

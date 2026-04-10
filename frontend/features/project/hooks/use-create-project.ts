@@ -16,7 +16,10 @@ export function useCreateProject(options?: { onSuccess?: () => void }) {
       const name = input.name.trim();
       if (!name) throw new Error('Name is required');
       const description = input.description?.trim() || undefined;
-      return projectApi.createProject({ name, ...(description ? { description } : {}) });
+      return projectApi.createProject({
+        name,
+        ...(description ? { description } : {}),
+      });
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['projects'] });

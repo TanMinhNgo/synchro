@@ -18,7 +18,9 @@ export function useFavoriteProjects(limit = 3) {
 
   const favorites = useMemo<FavoriteProject[]>(() => {
     const projects = projectsQuery.data ?? EMPTY_PROJECTS;
-    const projectNameById = new Map(projects.map((p) => [p.id, p.name] as const));
+    const projectNameById = new Map(
+      projects.map((p) => [p.id, p.name] as const),
+    );
     const projectSegmentById = new Map(
       projects.map((p) => [p.id, p.slug ?? p.id] as const),
     );
@@ -32,7 +34,10 @@ export function useFavoriteProjects(limit = 3) {
       .map(([projectId, interactions]) => ({
         projectId,
         interactions,
-        name: projectNameById.get(projectId) ?? items.find((i) => i.projectId === projectId)?.projectName ?? 'Project',
+        name:
+          projectNameById.get(projectId) ??
+          items.find((i) => i.projectId === projectId)?.projectName ??
+          'Project',
         href: `/projects/${projectSegmentById.get(projectId) ?? projectId}`,
       }))
       .sort((a, b) => b.interactions - a.interactions);

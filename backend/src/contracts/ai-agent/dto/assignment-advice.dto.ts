@@ -34,7 +34,10 @@ class CandidateAssigneeDto {
   @IsString({ each: true })
   skillTags?: string[];
 
-  @ApiPropertyOptional({ example: 18, description: 'Current weekly load in hours' })
+  @ApiPropertyOptional({
+    example: 18,
+    description: 'Current weekly load in hours',
+  })
   @IsOptional()
   @IsInt()
   @Min(0)
@@ -56,7 +59,9 @@ export class AssignmentAdviceDto {
   @MaxLength(200)
   taskTitle!: string;
 
-  @ApiPropertyOptional({ example: 'Need robust validation and notification flow.' })
+  @ApiPropertyOptional({
+    example: 'Need robust validation and notification flow.',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(3000)

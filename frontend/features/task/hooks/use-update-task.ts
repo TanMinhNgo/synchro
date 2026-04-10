@@ -32,7 +32,9 @@ export function useUpdateTask(options?: {
         title,
         description: input.description?.trim() || undefined,
         priority: input.priority,
-        ...(typeof input.assigneeIds !== 'undefined' ? { assigneeIds: input.assigneeIds } : {}),
+        ...(typeof input.assigneeIds !== 'undefined'
+          ? { assigneeIds: input.assigneeIds }
+          : {}),
         ...(input.dueDate ? { dueDate: input.dueDate } : {}),
         subtasks: input.subtasks,
         ...(input.attachments ? { attachments: input.attachments } : {}),
@@ -43,9 +45,12 @@ export function useUpdateTask(options?: {
       if (key) {
         const updateList =
           options?.updateList ??
-          ((prev: Task[] | undefined, value: Task) => (prev ?? []).map((t) => (t.id === value.id ? value : t)));
+          ((prev: Task[] | undefined, value: Task) =>
+            (prev ?? []).map((t) => (t.id === value.id ? value : t)));
 
-        queryClient.setQueryData<Task[]>(key, (prev) => updateList(prev, updated));
+        queryClient.setQueryData<Task[]>(key, (prev) =>
+          updateList(prev, updated),
+        );
         void queryClient.invalidateQueries({ queryKey: key });
       }
       options?.onSuccess?.(updated);

@@ -244,7 +244,8 @@ export class AuthController {
     },
   })
   @ApiUnauthorizedResponse({
-    description: 'Unauthorized (missing/invalid access token) or user not found',
+    description:
+      'Unauthorized (missing/invalid access token) or user not found',
   })
   async updateMe(
     @CurrentUser() user: { sub: string; email: string },

@@ -11,7 +11,9 @@ export default function AiAssistantPage() {
     <div className="flex h-[calc(100vh-10rem)] flex-col">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">AI Assistant</h1>
-        <p className="text-muted-foreground">Chat with Synchro AI to manage your tasks effectively.</p>
+        <p className="text-muted-foreground">
+          Chat with Synchro AI to manage your tasks effectively.
+        </p>
       </div>
 
       <Card className="mt-6 flex flex-1 flex-col overflow-hidden">
@@ -22,11 +24,12 @@ export default function AiAssistantPage() {
                 <Bot className="h-4 w-4 text-primary" />
               </div>
               <div className="rounded-lg bg-muted p-3 text-sm">
-                Hello! I am your AI assistant. How can I help you with your projects today?
+                Hello! I am your AI assistant. How can I help you with your
+                projects today?
               </div>
             </div>
           </div>
-          
+
           <div className="border-t p-4">
             <form className="flex items-center gap-2">
               <Input placeholder="Type your message..." className="flex-1" />

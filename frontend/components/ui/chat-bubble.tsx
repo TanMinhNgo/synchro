@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { ChevronRight, Mic } from "lucide-react";
-import Image from "next/image";
+import * as React from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ChevronRight, Mic } from 'lucide-react';
+import Image from 'next/image';
 
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
 
 interface User {
   id: string;
@@ -39,7 +39,7 @@ const SpeakingIndicator = () => (
           transition={{
             duration: 0.5 + Math.random() * 0.5,
             repeat: Infinity,
-            repeatType: "mirror",
+            repeatType: 'mirror',
           }}
         />
       ))}
@@ -80,8 +80,8 @@ export const VoiceChat = ({
       <PopoverTrigger asChild>
         <button
           className={cn(
-            "group relative flex h-14 cursor-pointer items-center justify-center rounded-full border bg-card p-2 pr-4 shadow-sm transition-all hover:border-primary/50",
-            className
+            'group relative flex h-14 cursor-pointer items-center justify-center rounded-full border bg-card p-2 pr-4 shadow-sm transition-all hover:border-primary/50',
+            className,
           )}
           aria-label={`Open voice chat with ${users.length} participants`}
           type="button"
@@ -132,10 +132,12 @@ export const VoiceChat = ({
               exit="exit"
               variants={popoverVariants}
               className="flex flex-col overflow-hidden rounded-2xl border bg-card"
-              style={{ transformOrigin: "top left" }}
+              style={{ transformOrigin: 'top left' }}
             >
               <div className="p-6 pb-4">
-                <h3 className="text-center text-lg font-semibold">Voice Chat</h3>
+                <h3 className="text-center text-lg font-semibold">
+                  Voice Chat
+                </h3>
               </div>
 
               <div className="grid grid-cols-4 gap-y-6 p-6 pt-0">

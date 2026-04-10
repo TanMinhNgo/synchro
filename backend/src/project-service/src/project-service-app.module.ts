@@ -11,7 +11,10 @@ import {
   ProjectColumnSchema,
 } from './modules/project/schemas/column.schema';
 import { Label, LabelSchema } from './modules/project/schemas/label.schema';
-import { Project, ProjectSchema } from './modules/project/schemas/project.schema';
+import {
+  Project,
+  ProjectSchema,
+} from './modules/project/schemas/project.schema';
 
 @Module({
   imports: [

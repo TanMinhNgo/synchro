@@ -24,8 +24,10 @@ function toResponse(doc: GoalDocument): GoalResponse {
     description: doc.description,
     targetDate: doc.targetDate ? doc.targetDate.toISOString() : undefined,
     progress: doc.progress,
-    createdAt: (doc as any).createdAt?.toISOString?.() ?? (doc as any).createdAt,
-    updatedAt: (doc as any).updatedAt?.toISOString?.() ?? (doc as any).updatedAt,
+    createdAt:
+      (doc as any).createdAt?.toISOString?.() ?? (doc as any).createdAt,
+    updatedAt:
+      (doc as any).updatedAt?.toISOString?.() ?? (doc as any).updatedAt,
   };
 }
 
@@ -63,7 +65,8 @@ export class GoalsService {
 
     const update: Record<string, unknown> = {};
     if (typeof dto.title === 'string') update.title = dto.title.trim();
-    if (typeof dto.description === 'string') update.description = dto.description.trim();
+    if (typeof dto.description === 'string')
+      update.description = dto.description.trim();
     if (dto.targetDate !== undefined) {
       update.targetDate = dto.targetDate ? new Date(dto.targetDate) : undefined;
     }

@@ -1,9 +1,15 @@
-"use client";
+'use client';
 
 import * as React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useCurrentUser, useUpdateProfile } from '@/features/auth';
 
@@ -34,29 +40,38 @@ export default function AccountsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Accounts</h1>
-        <p className="text-muted-foreground">Manage linked accounts and access.</p>
+        <p className="text-muted-foreground">
+          Manage linked accounts and access.
+        </p>
       </div>
 
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Profile</CardTitle>
-          <CardDescription>Update your display name and avatar.</CardDescription>
+          <CardDescription>
+            Update your display name and avatar.
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {currentUserQuery.isError && (
             <div className="text-sm text-destructive">
-              {(currentUserQuery.error as Error | undefined)?.message ?? 'Failed to load user'}
+              {(currentUserQuery.error as Error | undefined)?.message ??
+                'Failed to load user'}
             </div>
           )}
 
           <div className="flex items-center gap-4">
             <Avatar>
               <AvatarImage src={avatarSrc} alt={name || user?.name || 'User'} />
-              <AvatarFallback>{(name || user?.name || 'U').slice(0, 1).toUpperCase()}</AvatarFallback>
+              <AvatarFallback>
+                {(name || user?.name || 'U').slice(0, 1).toUpperCase()}
+              </AvatarFallback>
             </Avatar>
             <div className="min-w-0">
               <div className="text-sm font-medium">{user?.email ?? '—'}</div>
-              <div className="text-sm text-muted-foreground">Signed-in account</div>
+              <div className="text-sm text-muted-foreground">
+                Signed-in account
+              </div>
             </div>
           </div>
 
@@ -89,7 +104,8 @@ export default function AccountsPage() {
 
           {updateProfileMutation.isError && (
             <div className="text-sm text-destructive">
-              {(updateProfileMutation.error as Error | undefined)?.message ?? 'Failed to update profile'}
+              {(updateProfileMutation.error as Error | undefined)?.message ??
+                'Failed to update profile'}
             </div>
           )}
 

@@ -4,7 +4,13 @@ import * as React from 'react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -116,11 +122,15 @@ export function AiAgentPanel({
 
   const [historyPage, setHistoryPage] = React.useState(1);
   const [historyPageSize, setHistoryPageSize] = React.useState(10);
-  const [historyVerdict, setHistoryVerdict] = React.useState<'all' | TaskReportHistoryVerdict>('all');
+  const [historyVerdict, setHistoryVerdict] = React.useState<
+    'all' | TaskReportHistoryVerdict
+  >('all');
   const [historyMinScore, setHistoryMinScore] = React.useState('');
   const [historyMaxScore, setHistoryMaxScore] = React.useState('');
-  const [debouncedHistoryMinScore, setDebouncedHistoryMinScore] = React.useState('');
-  const [debouncedHistoryMaxScore, setDebouncedHistoryMaxScore] = React.useState('');
+  const [debouncedHistoryMinScore, setDebouncedHistoryMinScore] =
+    React.useState('');
+  const [debouncedHistoryMaxScore, setDebouncedHistoryMaxScore] =
+    React.useState('');
 
   const summaryMutation = useAiProjectReportSummary();
   const submitReportMutation = useSubmitTaskReport();
@@ -132,12 +142,14 @@ export function AiAgentPanel({
     }
   }, [selectedProjectId]);
 
-  const currentAdviceProjectId = adviceProjectId || (selectedProjectId !== 'all' ? selectedProjectId : '');
+  const currentAdviceProjectId =
+    adviceProjectId || (selectedProjectId !== 'all' ? selectedProjectId : '');
 
   const taskOptions = React.useMemo(() => {
-    const list = selectedProjectId === 'all'
-      ? tasks
-      : tasks.filter((x) => x.projectId === selectedProjectId);
+    const list =
+      selectedProjectId === 'all'
+        ? tasks
+        : tasks.filter((x) => x.projectId === selectedProjectId);
 
     return [...list].sort((a, b) => a.task.title.localeCompare(b.task.title));
   }, [tasks, selectedProjectId]);
@@ -168,9 +180,13 @@ export function AiAgentPanel({
   }, [historyMinScore, historyMaxScore]);
 
   const parsedMinScore =
-    debouncedHistoryMinScore.trim() === '' ? undefined : Number(debouncedHistoryMinScore);
+    debouncedHistoryMinScore.trim() === ''
+      ? undefined
+      : Number(debouncedHistoryMinScore);
   const parsedMaxScore =
-    debouncedHistoryMaxScore.trim() === '' ? undefined : Number(debouncedHistoryMaxScore);
+    debouncedHistoryMaxScore.trim() === ''
+      ? undefined
+      : Number(debouncedHistoryMaxScore);
 
   const taskHistoryQuery = useTaskReportHistory(reportTaskId, {
     enabled: Boolean(reportTaskId),
@@ -217,7 +233,8 @@ export function AiAgentPanel({
       <CardHeader>
         <CardTitle>AI Agent Assistant</CardTitle>
         <CardDescription>
-          Submit assignee reports for auto-review, generate project summary, and get assignment advice.
+          Submit assignee reports for auto-review, generate project summary, and
+          get assignment advice.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -309,7 +326,9 @@ export function AiAgentPanel({
                       ...(progressPercent !== ''
                         ? { progressPercent: Number(progressPercent) }
                         : {}),
-                      ...(workedHours !== '' ? { workedHours: Number(workedHours) } : {}),
+                      ...(workedHours !== ''
+                        ? { workedHours: Number(workedHours) }
+                        : {}),
                       ...(blockers.trim() ? { blockers: blockers.trim() } : {}),
                       ...(nextActions.trim()
                         ? { nextActions: nextActions.trim() }
@@ -326,21 +345,28 @@ export function AiAgentPanel({
                       taskHistoryQuery.refetch();
                     },
                     onError: (err) => {
-                      toast.error((err as Error).message || 'Failed to submit report');
+                      toast.error(
+                        (err as Error).message || 'Failed to submit report',
+                      );
                     },
                   },
                 );
               }}
             >
-              {submitReportMutation.isPending ? 'Reviewing…' : 'Submit Report (Event-driven AI)'}
+              {submitReportMutation.isPending
+                ? 'Reviewing…'
+                : 'Submit Report (Event-driven AI)'}
             </Button>
 
             {submitReportMutation.data && (
               <div className="space-y-2 rounded-md border bg-muted/30 p-3 text-sm">
                 <div className="flex items-center gap-2">
-                  <Badge variant="outline">{submitReportMutation.data.analysisSource}</Badge>
+                  <Badge variant="outline">
+                    {submitReportMutation.data.analysisSource}
+                  </Badge>
                   <Badge>
-                    {submitReportMutation.data.verdict} - {submitReportMutation.data.score}/100
+                    {submitReportMutation.data.verdict} -{' '}
+                    {submitReportMutation.data.score}/100
                   </Badge>
                 </div>
                 {submitReportMutation.data.llmSummary ? (
@@ -348,11 +374,13 @@ export function AiAgentPanel({
                 ) : null}
                 {submitReportMutation.data.issues.length > 0 ? (
                   <ul className="list-disc pl-5">
-                    {submitReportMutation.data.issues.slice(0, 4).map((issue) => (
-                      <li key={`${issue.code}-${issue.message}`}>
-                        [{issue.severity}] {issue.message}
-                      </li>
-                    ))}
+                    {submitReportMutation.data.issues
+                      .slice(0, 4)
+                      .map((issue) => (
+                        <li key={`${issue.code}-${issue.message}`}>
+                          [{issue.severity}] {issue.message}
+                        </li>
+                      ))}
                   </ul>
                 ) : (
                   <p>No major issues detected.</p>
@@ -364,7 +392,9 @@ export function AiAgentPanel({
               <div className="flex items-center justify-between">
                 <h4 className="font-medium">Report Submission History</h4>
                 {taskHistoryQuery.isFetching ? (
-                  <span className="text-xs text-muted-foreground">Refreshing…</span>
+                  <span className="text-xs text-muted-foreground">
+                    Refreshing…
+                  </span>
                 ) : null}
               </div>
 
@@ -373,7 +403,9 @@ export function AiAgentPanel({
                   <Label className="text-xs">Verdict</Label>
                   <Select
                     value={historyVerdict}
-                    onValueChange={(v) => setHistoryVerdict(v as 'all' | TaskReportHistoryVerdict)}
+                    onValueChange={(v) =>
+                      setHistoryVerdict(v as 'all' | TaskReportHistoryVerdict)
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="All verdicts" />
@@ -381,7 +413,9 @@ export function AiAgentPanel({
                     <SelectContent>
                       <SelectItem value="all">All verdicts</SelectItem>
                       <SelectItem value="needs_fix">needs_fix</SelectItem>
-                      <SelectItem value="review_manually">review_manually</SelectItem>
+                      <SelectItem value="review_manually">
+                        review_manually
+                      </SelectItem>
                       <SelectItem value="reasonable">reasonable</SelectItem>
                     </SelectContent>
                   </Select>
@@ -449,7 +483,8 @@ export function AiAgentPanel({
 
               {taskHistoryQuery.isError ? (
                 <p className="text-sm text-destructive">
-                  {(taskHistoryQuery.error as Error).message || 'Failed to load report history'}
+                  {(taskHistoryQuery.error as Error).message ||
+                    'Failed to load report history'}
                 </p>
               ) : null}
 
@@ -483,21 +518,27 @@ export function AiAgentPanel({
                   </TableBody>
                 </Table>
               ) : (
-                <p className="text-sm text-muted-foreground">No report history yet for this task.</p>
+                <p className="text-sm text-muted-foreground">
+                  No report history yet for this task.
+                </p>
               )}
 
               {taskHistoryQuery.data?.pagination ? (
                 <div className="flex flex-col gap-2 pt-2 text-xs text-muted-foreground md:flex-row md:items-center md:justify-between">
                   <span>
-                    Showing page {taskHistoryQuery.data.pagination.page}/{taskHistoryQuery.data.pagination.totalPages}
-                    {' '}({taskHistoryQuery.data.pagination.totalItems} item(s))
+                    Showing page {taskHistoryQuery.data.pagination.page}/
+                    {taskHistoryQuery.data.pagination.totalPages} (
+                    {taskHistoryQuery.data.pagination.totalItems} item(s))
                   </span>
                   <div className="flex items-center gap-2">
                     <Button
                       type="button"
                       size="sm"
                       variant="outline"
-                      disabled={taskHistoryQuery.data.pagination.page <= 1 || taskHistoryQuery.isFetching}
+                      disabled={
+                        taskHistoryQuery.data.pagination.page <= 1 ||
+                        taskHistoryQuery.isFetching
+                      }
                       onClick={() => setHistoryPage((p) => Math.max(1, p - 1))}
                     >
                       Prev
@@ -507,12 +548,16 @@ export function AiAgentPanel({
                       size="sm"
                       variant="outline"
                       disabled={
-                        taskHistoryQuery.data.pagination.page >= taskHistoryQuery.data.pagination.totalPages ||
+                        taskHistoryQuery.data.pagination.page >=
+                          taskHistoryQuery.data.pagination.totalPages ||
                         taskHistoryQuery.isFetching
                       }
                       onClick={() =>
                         setHistoryPage((p) =>
-                          Math.min(taskHistoryQuery.data?.pagination.totalPages ?? p, p + 1),
+                          Math.min(
+                            taskHistoryQuery.data?.pagination.totalPages ?? p,
+                            p + 1,
+                          ),
                         )
                       }
                     >
@@ -556,24 +601,35 @@ export function AiAgentPanel({
                     { projectId: currentAdviceProjectId },
                     {
                       onError: (err) => {
-                        toast.error((err as Error).message || 'Failed to get summary');
+                        toast.error(
+                          (err as Error).message || 'Failed to get summary',
+                        );
                       },
                     },
                   );
                 }}
               >
-                {summaryMutation.isPending ? 'Generating…' : 'Generate Project Summary'}
+                {summaryMutation.isPending
+                  ? 'Generating…'
+                  : 'Generate Project Summary'}
               </Button>
             </div>
 
             {summaryMutation.data && (
               <div className="space-y-2 rounded-md border bg-muted/30 p-3 text-sm">
                 <div className="flex flex-wrap items-center gap-2">
-                  <Badge>Total: {summaryMutation.data.summary.totalTasks}</Badge>
-                  <Badge variant="secondary">Done: {summaryMutation.data.summary.doneTasks}</Badge>
-                  <Badge variant="secondary">Overdue: {summaryMutation.data.summary.overdueTasks}</Badge>
+                  <Badge>
+                    Total: {summaryMutation.data.summary.totalTasks}
+                  </Badge>
+                  <Badge variant="secondary">
+                    Done: {summaryMutation.data.summary.doneTasks}
+                  </Badge>
+                  <Badge variant="secondary">
+                    Overdue: {summaryMutation.data.summary.overdueTasks}
+                  </Badge>
                   <Badge variant="outline">
-                    Completion: {summaryMutation.data.summary.completionRatePercent}%
+                    Completion:{' '}
+                    {summaryMutation.data.summary.completionRatePercent}%
                   </Badge>
                 </div>
                 <ul className="list-disc pl-5">
@@ -632,11 +688,13 @@ export function AiAgentPanel({
                 onClick={() => {
                   if (!currentAdviceProjectId) return;
 
-                  const candidates = (membersQuery.data ?? []).map((member) => ({
-                    userId: member.id,
-                    displayName: member.name,
-                    skillTags: [],
-                  }));
+                  const candidates = (membersQuery.data ?? []).map(
+                    (member) => ({
+                      userId: member.id,
+                      displayName: member.name,
+                      skillTags: [],
+                    }),
+                  );
 
                   assignmentAdviceMutation.mutate(
                     {
@@ -661,7 +719,8 @@ export function AiAgentPanel({
                     {
                       onError: (err) => {
                         toast.error(
-                          (err as Error).message || 'Failed to generate assignment advice',
+                          (err as Error).message ||
+                            'Failed to generate assignment advice',
                         );
                       },
                     },
@@ -676,14 +735,17 @@ export function AiAgentPanel({
               {assignmentAdviceMutation.data && (
                 <div className="space-y-2 rounded-md border bg-muted/30 p-3 text-sm">
                   <div>
-                    Recommended: {assignmentAdviceMutation.data.recommendation?.displayName ?? 'N/A'}
-                    {' '}({assignmentAdviceMutation.data.recommendation?.score ?? 0})
+                    Recommended:{' '}
+                    {assignmentAdviceMutation.data.recommendation
+                      ?.displayName ?? 'N/A'}{' '}
+                    ({assignmentAdviceMutation.data.recommendation?.score ?? 0})
                   </div>
                   <div>
                     Suggested due:{' '}
                     {toLocalDatetimeInput(
                       assignmentAdviceMutation.data.schedule.suggestedDueDate,
-                    ) || assignmentAdviceMutation.data.schedule.suggestedDueDate}
+                    ) ||
+                      assignmentAdviceMutation.data.schedule.suggestedDueDate}
                   </div>
                   {assignmentAdviceMutation.data.schedule.warning ? (
                     <p className="text-amber-700">

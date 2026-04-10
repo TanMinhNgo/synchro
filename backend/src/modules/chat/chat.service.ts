@@ -43,9 +43,7 @@ export class ChatService {
     try {
       await channel.addMembers([userId]);
     } catch {
-        console.warn(
-          `Failed to add user to general channel (userId: ${userId})`,
-        );
+      console.warn(`Failed to add user to general channel (userId: ${userId})`);
     }
   }
 

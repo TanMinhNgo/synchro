@@ -4,11 +4,23 @@ import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useProjects } from '@/features/project';
 import { useCreateProject } from '@/features/project/hooks/use-create-project';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -36,7 +48,9 @@ export default function ProjectsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
-          <p className="text-muted-foreground">Manage your projects and workspaces.</p>
+          <p className="text-muted-foreground">
+            Manage your projects and workspaces.
+          </p>
         </div>
         <Button onClick={() => setIsCreateOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
@@ -79,12 +93,17 @@ export default function ProjectsPage() {
 
             {createProjectMutation.isError && (
               <div className="text-sm text-destructive">
-                {(createProjectMutation.error as Error)?.message ?? 'Failed to create project.'}
+                {(createProjectMutation.error as Error)?.message ??
+                  'Failed to create project.'}
               </div>
             )}
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsCreateOpen(false)}
+              >
                 Cancel
               </Button>
               <Button type="submit" disabled={!canSubmit}>
@@ -107,7 +126,9 @@ export default function ProjectsPage() {
         {projectsQuery.isError && (
           <Card className="border-destructive/30">
             <CardHeader>
-              <CardTitle className="text-base">Failed to load projects</CardTitle>
+              <CardTitle className="text-base">
+                Failed to load projects
+              </CardTitle>
               <CardDescription>
                 {(projectsQuery.error as Error)?.message ?? 'Unknown error'}
               </CardDescription>
@@ -116,12 +137,19 @@ export default function ProjectsPage() {
         )}
 
         {projects.map((project) => (
-          <Link key={project.id} href={`/projects/${project.slug ?? project.id}`}>
+          <Link
+            key={project.id}
+            href={`/projects/${project.slug ?? project.id}`}
+          >
             <Card className="hover:border-primary/50 transition-colors">
               <CardHeader className="pb-2">
                 <div className="flex justify-between items-start">
                   <CardTitle className="text-xl">{project.name}</CardTitle>
-                  <Badge variant={project.status === 'ACTIVE' ? 'default' : 'secondary'}>
+                  <Badge
+                    variant={
+                      project.status === 'ACTIVE' ? 'default' : 'secondary'
+                    }
+                  >
                     {project.status}
                   </Badge>
                 </div>

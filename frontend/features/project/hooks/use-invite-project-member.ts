@@ -3,7 +3,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { projectApi } from '../api/project.api';
 
-export function useInviteProjectMember(projectId: string, options?: { onSuccess?: () => void }) {
+export function useInviteProjectMember(
+  projectId: string,
+  options?: { onSuccess?: () => void },
+) {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -13,7 +16,9 @@ export function useInviteProjectMember(projectId: string, options?: { onSuccess?
       await projectApi.inviteMember(projectId, email);
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['projects', projectId, 'members'] });
+      await queryClient.invalidateQueries({
+        queryKey: ['projects', projectId, 'members'],
+      });
       options?.onSuccess?.();
     },
   });

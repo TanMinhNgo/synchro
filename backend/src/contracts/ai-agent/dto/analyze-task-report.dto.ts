@@ -28,7 +28,10 @@ export class AnalyzeTaskReportDto {
   @Max(100)
   progressPercent?: number;
 
-  @ApiPropertyOptional({ example: 6, description: 'Worked hours in this report' })
+  @ApiPropertyOptional({
+    example: 6,
+    description: 'Worked hours in this report',
+  })
   @IsOptional()
   @IsInt()
   @Min(0)
@@ -41,7 +44,9 @@ export class AnalyzeTaskReportDto {
   @MaxLength(2000)
   blockers?: string;
 
-  @ApiPropertyOptional({ example: 'Complete integration tests and move to review.' })
+  @ApiPropertyOptional({
+    example: 'Complete integration tests and move to review.',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(2000)

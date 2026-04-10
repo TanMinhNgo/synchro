@@ -19,7 +19,9 @@ export function useDeleteTask(options?: {
     onSuccess: (deletedTaskId) => {
       const key = options?.listQueryKey;
       if (key) {
-        queryClient.setQueryData<Task[]>(key, (prev) => (prev ?? []).filter((t) => t.id !== deletedTaskId));
+        queryClient.setQueryData<Task[]>(key, (prev) =>
+          (prev ?? []).filter((t) => t.id !== deletedTaskId),
+        );
         void queryClient.invalidateQueries({ queryKey: key });
       }
       options?.onSuccess?.(deletedTaskId);

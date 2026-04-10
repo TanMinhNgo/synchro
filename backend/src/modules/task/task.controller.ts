@@ -36,7 +36,8 @@ function getTaskProjectId(task: unknown): string {
 function getProjectId(project: unknown): string {
   if (!project || typeof project !== 'object')
     throw new Error('Invalid project payload');
-  const raw = (project as { id?: unknown; _id?: unknown }).id ??
+  const raw =
+    (project as { id?: unknown; _id?: unknown }).id ??
     (project as { id?: unknown; _id?: unknown })._id;
   if (typeof raw === 'string' && raw) return raw;
   if (raw && typeof raw === 'object' && 'toString' in raw) {

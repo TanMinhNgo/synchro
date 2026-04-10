@@ -1,4 +1,9 @@
-import { BadGatewayException, Inject, Injectable, Logger } from '@nestjs/common';
+import {
+  BadGatewayException,
+  Inject,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import type { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom, timeout } from 'rxjs';
 import type { CreateBoardDto } from '@/contracts/project/dto/create-board.dto';
@@ -8,9 +13,7 @@ import type { CreateProjectDto } from '@/contracts/project/dto/create-project.dt
 import type { UpdateColumnDto } from '@/contracts/project/dto/update-column.dto';
 import type { UpdateProjectDto } from '@/contracts/project/dto/update-project.dto';
 import { projectServiceSubjects } from '@/contracts/project/project.subjects';
-import {
-  PROJECT_SERVICE_NATS_CLIENT,
-} from './project-service.nats';
+import { PROJECT_SERVICE_NATS_CLIENT } from './project-service.nats';
 
 @Injectable()
 export class ProjectServiceClient {

@@ -14,6 +14,8 @@ export function useProjectBoards(
     queryKey: ['projects', projectId, 'boards'],
     queryFn: () => projectApi.listBoards(projectId),
     enabled: options?.enabled ?? Boolean(projectId),
-    ...(typeof options?.staleTime === 'number' ? { staleTime: options.staleTime } : {}),
+    ...(typeof options?.staleTime === 'number'
+      ? { staleTime: options.staleTime }
+      : {}),
   });
 }

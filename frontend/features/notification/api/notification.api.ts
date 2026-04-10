@@ -9,7 +9,8 @@ import type {
 function normalizeId<T extends MongoIdLike & Record<string, unknown>>(
   obj: T,
 ): T & { id: string } {
-  const idValue = (obj as { id?: unknown }).id ?? (obj as { _id?: unknown })._id;
+  const idValue =
+    (obj as { id?: unknown }).id ?? (obj as { _id?: unknown })._id;
   if (typeof idValue !== 'string' || !idValue) {
     throw new Error('Invalid payload: missing id');
   }
@@ -26,19 +27,32 @@ export const notificationApi = {
       ? (res.data as Array<Record<string, unknown>>)
       : [];
 
-    return items.map((n) =>
-      normalizeId(n as Record<string, unknown> & MongoIdLike) as unknown as Notification,
+    return items.map(
+      (n) =>
+        normalizeId(
+          n as Record<string, unknown> & MongoIdLike,
+        ) as unknown as Notification,
     );
   },
 
   async create(input: CreateNotificationInput): Promise<Notification> {
     const res = await apiClient.post('/notifications', input);
-    return normalizeId(res.data as Record<string, unknown> & MongoIdLike) as unknown as Notification;
+    return normalizeId(
+      res.data as Record<string, unknown> & MongoIdLike,
+    ) as unknown as Notification;
   },
 
-  async markRead(notificationId: string, input: MarkReadInput): Promise<Notification> {
-    const res = await apiClient.post(`/notifications/${notificationId}/read`, input);
-    return normalizeId(res.data as Record<string, unknown> & MongoIdLike) as unknown as Notification;
+  async markRead(
+    notificationId: string,
+    input: MarkReadInput,
+  ): Promise<Notification> {
+    const res = await apiClient.post(
+      `/notifications/${notificationId}/read`,
+      input,
+    );
+    return normalizeId(
+      res.data as Record<string, unknown> & MongoIdLike,
+    ) as unknown as Notification;
   },
 
   async markAllRead(): Promise<{ ok: boolean } | void> {

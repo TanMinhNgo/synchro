@@ -33,11 +33,17 @@ export default function ChatCallPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const callId = React.useMemo(() => normalizeCallId(searchParams.get('callId')), [searchParams]);
+  const callId = React.useMemo(
+    () => normalizeCallId(searchParams.get('callId')),
+    [searchParams],
+  );
   const videoTokenQuery = useVideoToken(Boolean(me), callId);
 
-  const [videoClient, setVideoClient] = React.useState<StreamVideoClient | null>(null);
-  const [videoCall, setVideoCall] = React.useState<ReturnType<StreamVideoClient['call']> | null>(null);
+  const [videoClient, setVideoClient] =
+    React.useState<StreamVideoClient | null>(null);
+  const [videoCall, setVideoCall] = React.useState<ReturnType<
+    StreamVideoClient['call']
+  > | null>(null);
   const [isConnecting, setIsConnecting] = React.useState(true);
 
   React.useEffect(() => {
@@ -71,8 +77,7 @@ export default function ChatCallPage() {
           setVideoCall(null);
           toast.error('Cannot connect to the call.');
         }
-      }
-      finally {
+      } finally {
         if (!cancelled) setIsConnecting(false);
       }
     })();
@@ -100,7 +105,8 @@ export default function ChatCallPage() {
       <Card className="p-6 border-destructive/30">
         <div className="text-sm">Failed to load video token.</div>
         <div className="text-xs text-muted-foreground mt-1">
-          {(videoTokenQuery.error as Error | undefined)?.message ?? 'Unknown error'}
+          {(videoTokenQuery.error as Error | undefined)?.message ??
+            'Unknown error'}
         </div>
       </Card>
     );
@@ -124,7 +130,9 @@ export default function ChatCallPage() {
             <Card className="overflow-hidden">
               <div className="border-b px-4 py-3">
                 <div className="text-sm font-semibold">Video call</div>
-                <div className="text-xs text-muted-foreground">Room: {callId}</div>
+                <div className="text-xs text-muted-foreground">
+                  Room: {callId}
+                </div>
               </div>
               <div className="h-[70vh]">
                 <CallContent
@@ -132,7 +140,9 @@ export default function ChatCallPage() {
                     try {
                       window.close();
                     } catch {
-                      console.warn('Failed to close window after leaving call.');
+                      console.warn(
+                        'Failed to close window after leaving call.',
+                      );
                     }
                     router.push('/chat');
                   }}

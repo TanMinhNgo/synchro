@@ -40,19 +40,27 @@ export function DeleteBoardTaskAlert({
   });
 
   return (
-    <AlertDialog open={Boolean(deletingTask)} onOpenChange={(open) => (!open ? onClose() : undefined)}>
+    <AlertDialog
+      open={Boolean(deletingTask)}
+      onOpenChange={(open) => (!open ? onClose() : undefined)}
+    >
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Delete task?</AlertDialogTitle>
-          <AlertDialogDescription>This action can’t be undone.</AlertDialogDescription>
+          <AlertDialogDescription>
+            This action can’t be undone.
+          </AlertDialogDescription>
         </AlertDialogHeader>
         {deleteTaskMutation.isError && (
           <div className="text-sm text-destructive">
-            {(deleteTaskMutation.error as Error)?.message ?? 'Failed to delete task.'}
+            {(deleteTaskMutation.error as Error)?.message ??
+              'Failed to delete task.'}
           </div>
         )}
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={deleteTaskMutation.isPending}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={deleteTaskMutation.isPending}>
+            Cancel
+          </AlertDialogCancel>
           <AlertDialogAction
             onClick={(e) => {
               e.preventDefault();

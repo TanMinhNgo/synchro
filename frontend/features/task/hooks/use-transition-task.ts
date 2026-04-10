@@ -13,7 +13,9 @@ export type TransitionTaskInput = {
 
 export function useTransitionTask(options: {
   listQueryKey?: readonly unknown[];
-  getListQueryKey?: (vars: TransitionTaskInput) => readonly unknown[] | undefined;
+  getListQueryKey?: (
+    vars: TransitionTaskInput,
+  ) => readonly unknown[] | undefined;
   onSuccess?: () => void;
 }) {
   const queryClient = useQueryClient();
@@ -22,12 +24,16 @@ export function useTransitionTask(options: {
     mutationFn: async (vars: TransitionTaskInput) =>
       taskApi.transitionTask(vars.taskId, { columnKey: vars.nextColumnKey }),
     onMutate: async (vars) => {
-      const key = options.getListQueryKey ? options.getListQueryKey(vars) : options.listQueryKey;
+      const key = options.getListQueryKey
+        ? options.getListQueryKey(vars)
+        : options.listQueryKey;
       if (!key) return { previous: undefined as Task[] | undefined };
       await queryClient.cancelQueries({ queryKey: key });
       const previous = queryClient.getQueryData<Task[]>(key);
       queryClient.setQueryData<Task[]>(key, (prev) =>
-        (prev ?? []).map((t) => (t.id === vars.taskId ? { ...t, columnKey: vars.nextColumnKey } : t)),
+        (prev ?? []).map((t) =>
+          t.id === vars.taskId ? { ...t, columnKey: vars.nextColumnKey } : t,
+        ),
       );
       return { previous, key };
     },
@@ -39,7 +45,9 @@ export function useTransitionTask(options: {
     onSettled: (_data, _error, vars, ctx) => {
       const key =
         ctx?.key ??
-        (options.getListQueryKey ? options.getListQueryKey(vars) : options.listQueryKey);
+        (options.getListQueryKey
+          ? options.getListQueryKey(vars)
+          : options.listQueryKey);
       if (key) void queryClient.invalidateQueries({ queryKey: key });
       options.onSuccess?.();
     },

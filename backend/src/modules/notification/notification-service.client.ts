@@ -3,9 +3,7 @@ import type { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom, timeout } from 'rxjs';
 import type { CreateNotificationDto } from '@/contracts/notification/dto/create-notification.dto';
 import { notificationServiceSubjects } from '@/contracts/notification/notification.subjects';
-import {
-  NOTIFICATION_SERVICE_NATS_CLIENT,
-} from './notification-service.nats';
+import { NOTIFICATION_SERVICE_NATS_CLIENT } from './notification-service.nats';
 
 @Injectable()
 export class NotificationServiceClient {

@@ -4,7 +4,7 @@ import { User } from '@/shared/types/user';
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
-  
+
   setAuth: (user: User, token: string) => void;
   clearAuth: () => void;
 }
