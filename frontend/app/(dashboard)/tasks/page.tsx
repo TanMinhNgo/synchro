@@ -66,9 +66,6 @@ export default function MyTasksPage() {
   return (
     <div className="flex h-full flex-col gap-6 p-2">
       <AiAgentPanel
-        tasks={filteredItems}
-        projects={projects}
-        selectedProjectId={selectedProjectId}
       />
 
       <TaskCalendarCard

@@ -212,7 +212,6 @@ export function EditBoardTaskDialog({
             <Popover>
               <PopoverTrigger asChild>
                 <Button
-                  type="button"
                   variant="outline"
                   className="w-full justify-start gap-2 h-auto min-h-10 flex-wrap"
                 >

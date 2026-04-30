@@ -18,6 +18,7 @@ import { CurrentUser } from '@/common/decorators/current-user.decorator';
 import type { CurrentUserClaims } from '@/common/decorators/current-user.decorator';
 import { AnalyzeTaskReportDto } from '@/contracts/ai-agent/dto/analyze-task-report.dto';
 import { AssignmentAdviceDto } from '@/contracts/ai-agent/dto/assignment-advice.dto';
+import { AssistantChatDto } from '@/contracts/ai-agent/dto/assistant-chat.dto';
 import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
 import { AI_TASK_REPORT_SUBMITTED_EVENT } from './ai-agent.events';
 import type { TaskReportSubmittedEvent } from './ai-agent.events';
@@ -128,5 +129,17 @@ export class AiAgentController {
     @Body() dto: AssignmentAdviceDto,
   ) {
     return this.ai.getAssignmentAdvice(user.sub, projectId, dto);
+  }
+
+  @Post('chat')
+  @ApiOperation({
+    summary: 'Chat with AI assistant for project and task guidance',
+  })
+  @ApiOkResponse({ description: 'Assistant response' })
+  chatWithAssistant(
+    @CurrentUser() user: CurrentUserClaims,
+    @Body() dto: AssistantChatDto,
+  ) {
+    return this.ai.chatWithAssistant(user.sub, dto);
   }
 }

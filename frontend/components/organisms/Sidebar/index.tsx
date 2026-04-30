@@ -23,12 +23,13 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useCurrentUser } from '@/features/auth';
+import { useNotificationRealtime, useNotifications } from '@/features/notification';
 import { useFavoriteProjects } from '@/features/project/hooks/use-favorite-projects';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'My Task', href: '/tasks', icon: CheckSquare },
-  { name: 'Inbox', href: '/inbox', icon: Inbox, count: 5 },
+  { name: 'Inbox', href: '/inbox', icon: Inbox },
   { name: 'Chat', href: '/chat', icon: MessagesSquare },
   { name: 'Reporting', href: '/reporting', icon: PieChart },
   { name: 'Portfolio', href: '/portfolio', icon: FolderOpen },
@@ -40,6 +41,14 @@ export function Sidebar() {
   const pathname = usePathname();
   const { data: user } = useCurrentUser();
   const { favorites } = useFavoriteProjects(3);
+  const notificationsQuery = useNotifications({ unreadOnly: true });
+
+  useNotificationRealtime();
+
+  const unreadCount = React.useMemo(
+    () => notificationsQuery.data?.length ?? 0,
+    [notificationsQuery.data],
+  );
 
   return (
     <div className="flex h-full w-65 flex-col border-r bg-background shrink-0">
@@ -84,6 +93,7 @@ export function Sidebar() {
           {navigation.map((item) => {
             const isActive =
               pathname.startsWith(item.href) || pathname === item.href;
+            const count = item.name === 'Inbox' ? unreadCount : item.count;
             return (
               <Link
                 key={item.name}
@@ -99,14 +109,14 @@ export function Sidebar() {
                   <item.icon className="h-4 w-4" />
                   {item.name}
                 </div>
-                {item.count && (
+                {count ? (
                   <Badge
                     variant="outline"
                     className="h-5 rounded-md px-1.5 text-xs font-normal border-none bg-secondary text-muted-foreground"
                   >
-                    {item.count}
+                    {count}
                   </Badge>
-                )}
+                ) : null}
               </Link>
             );
           })}

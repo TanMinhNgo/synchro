@@ -45,6 +45,19 @@ function uniqById(items: VoiceChatParticipant[]) {
 
 export function useVideoCallParticipants(enabled: boolean, callId: string) {
   const tokenQuery = useVideoToken(enabled, callId);
+  const [isPageVisible, setIsPageVisible] = React.useState(true);
+
+  React.useEffect(() => {
+    const handleVisibility = () => {
+      setIsPageVisible(document.visibilityState === 'visible');
+    };
+
+    handleVisibility();
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  }, []);
 
   const videoClient = React.useMemo(() => {
     if (!tokenQuery.data) return null;
@@ -75,8 +88,11 @@ export function useVideoCallParticipants(enabled: boolean, callId: string) {
       Boolean(videoClient) &&
       Boolean(tokenQuery.data) &&
       tokenQuery.isSuccess,
-    refetchInterval: 3_000,
-    staleTime: 0,
+    refetchInterval:
+      enabled && isPageVisible && Boolean(videoClient) ? 15_000 : false,
+    refetchOnWindowFocus: true,
+    refetchIntervalInBackground: false,
+    staleTime: 10_000,
     retry: false,
     queryFn: async () => {
       try {

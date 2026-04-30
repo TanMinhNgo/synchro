@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import type { Model } from 'mongoose';
 import type { AnalyzeTaskReportDto } from '@/contracts/ai-agent/dto/analyze-task-report.dto';
 import type { AssignmentAdviceDto } from '@/contracts/ai-agent/dto/assignment-advice.dto';
+import type { AssistantChatDto } from '@/contracts/ai-agent/dto/assistant-chat.dto';
 import { NotificationProxyService } from '@/modules/notification/notification.proxy.service';
 import { ProjectServiceClient } from '@/modules/project/project-service.client';
 import { TaskServiceClient } from '@/modules/task/task-service.client';
@@ -531,6 +532,60 @@ export class AiAgentService {
     };
   }
 
+  async chatWithAssistant(userId: string, dto: AssistantChatDto) {
+    if (!dto.messages || dto.messages.length === 0) {
+      throw new BadRequestException('messages are required');
+    }
+
+    const systemPrompt =
+      'You are Synchro AI assistant. Help with project planning, task breakdowns, progress summaries, and next-step advice. Be concise and actionable.';
+
+    const messages = [
+      { role: 'system', content: systemPrompt },
+      ...dto.messages.map((m) => ({ role: m.role, content: m.content })),
+    ];
+
+    const preferredProvider = (
+      this.config.get<string>('AI_REVIEW_PROVIDER') ?? ''
+    ).toLowerCase();
+
+    let content: string | null;
+    let modelUsed: string | undefined;
+    let providerUsed: 'openai' | 'azure-openai' | null;
+
+    if (preferredProvider === 'azure-openai') {
+      content = await this.callAzureOpenAi(messages, dto);
+      providerUsed = content ? 'azure-openai' : null;
+    } else if (preferredProvider === 'openai') {
+      content = await this.callOpenAi(messages, dto);
+      providerUsed = content ? 'openai' : null;
+    } else {
+      content = (await this.callOpenAi(messages, dto)) ?? null;
+      providerUsed = content ? 'openai' : null;
+      if (!content) {
+        content = await this.callAzureOpenAi(messages, dto);
+        providerUsed = content ? 'azure-openai' : null;
+      }
+    }
+
+    if (!content) {
+      throw new BadRequestException('AI provider is not configured');
+    }
+
+    modelUsed =
+      providerUsed === 'azure-openai'
+        ? this.config.get<string>('AZURE_OPENAI_DEPLOYMENT')
+        : this.config.get<string>('OPENAI_MODEL') ?? 'gpt-5.0-mini';
+
+    return {
+      userId,
+      reply: content,
+      provider: providerUsed ?? 'unknown',
+      model: modelUsed,
+      generatedAt: new Date().toISOString(),
+    };
+  }
+
   private computeScore(issues: ReviewIssue[]) {
     let score = 100;
     issues.forEach((issue) => {
@@ -783,6 +838,73 @@ export class AiAgentService {
       recommendations: this.normalizeRecommendations(parsed.recommendations),
       summary: this.pickString(parsed.summary),
     };
+  }
+
+  private async callOpenAi(
+    messages: Array<{ role: string; content: string }>,
+    dto: AssistantChatDto,
+  ) {
+    const apiKey = this.config.get<string>('OPENAI_API_KEY');
+    if (!apiKey) return null;
+
+    const model = this.config.get<string>('OPENAI_MODEL') ?? 'gpt-5.0-mini';
+
+    const response = await fetch(
+      'https://api.openai.com/v1/chat/completions',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model,
+          temperature: dto.temperature ?? 0.4,
+          max_tokens: dto.maxTokens ?? 512,
+          messages,
+        }),
+      },
+    );
+
+    if (!response.ok) return null;
+    const data = (await response.json()) as {
+      choices?: Array<{ message?: { content?: string } }>;
+    };
+    return data.choices?.[0]?.message?.content ?? null;
+  }
+
+  private async callAzureOpenAi(
+    messages: Array<{ role: string; content: string }>,
+    dto: AssistantChatDto,
+  ) {
+    const endpoint = this.config.get<string>('AZURE_OPENAI_ENDPOINT');
+    const apiKey = this.config.get<string>('AZURE_OPENAI_API_KEY');
+    const deployment = this.config.get<string>('AZURE_OPENAI_DEPLOYMENT');
+    const apiVersion =
+      this.config.get<string>('AZURE_OPENAI_API_VERSION') ?? '2024-10-21';
+
+    if (!endpoint || !apiKey || !deployment) return null;
+
+    const url = `${endpoint.replace(/\/+$/, '')}/openai/deployments/${deployment}/chat/completions?api-version=${apiVersion}`;
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'api-key': apiKey,
+      },
+      body: JSON.stringify({
+        temperature: dto.temperature ?? 0.4,
+        max_tokens: dto.maxTokens ?? 512,
+        messages,
+      }),
+    });
+
+    if (!response.ok) return null;
+    const data = (await response.json()) as {
+      choices?: Array<{ message?: { content?: string } }>;
+    };
+    return data.choices?.[0]?.message?.content ?? null;
   }
 
   private buildRecommendations(

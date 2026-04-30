@@ -2,6 +2,8 @@ import { apiClient } from '@/shared/api/client';
 import type {
   AnalyzeTaskReportInput,
   AnalyzeTaskReportResult,
+  AssistantChatRequest,
+  AssistantChatResponse,
   AssignmentAdviceInput,
   AssignmentAdviceResult,
   ProjectReportSummaryResult,
@@ -61,5 +63,10 @@ export const aiAgentApi = {
       input,
     );
     return res.data as AssignmentAdviceResult;
+  },
+
+  async chatWithAssistant(input: AssistantChatRequest) {
+    const res = await apiClient.post(`/ai-agent/chat`, input);
+    return res.data as AssistantChatResponse;
   },
 };

@@ -6,6 +6,25 @@ export type AiReviewIssue = {
   message: string;
 };
 
+export type AssistantChatMessage = {
+  role: 'system' | 'user' | 'assistant';
+  content: string;
+};
+
+export type AssistantChatRequest = {
+  messages: AssistantChatMessage[];
+  temperature?: number;
+  maxTokens?: number;
+};
+
+export type AssistantChatResponse = {
+  userId: string;
+  reply: string;
+  provider: 'openai' | 'azure-openai' | 'unknown';
+  model: string;
+  generatedAt: string;
+};
+
 export type AnalyzeTaskReportInput = {
   reportText: string;
   progressPercent?: number;
