@@ -114,7 +114,7 @@ export function TaskCard({
         }
       }}
       className={
-        'flex flex-col gap-4 p-5 hover:shadow-sm transition-all border border-border bg-card cursor-grab active:cursor-grabbing rounded-2xl' +
+        'flex flex-col gap-4 p-5 card-lift border border-border/70 bg-card/90 cursor-grab active:cursor-grabbing rounded-3xl' +
         (isDragging ? ' opacity-0' : '')
       }
     >
@@ -138,7 +138,7 @@ export function TaskCard({
       </div>
 
       <div className="flex items-center gap-2">
-        <div className="flex items-center gap-1 rounded-xl px-2 py-1 text-xs font-medium bg-muted/50 text-muted-foreground">
+        <div className="flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium bg-accent/60 text-foreground/70">
           <Calendar className="h-3 w-3" />
           <span>{deadline || '—'}</span>
         </div>

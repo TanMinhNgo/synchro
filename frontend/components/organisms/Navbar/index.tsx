@@ -71,13 +71,15 @@ export function Navbar() {
     pageName.charAt(0).toUpperCase() + pageName.slice(1);
 
   return (
-    <header className="flex h-18 items-center justify-between border-b bg-background px-6 shrink-0">
+    <header className="flex h-18 items-center justify-between border-b border-border/70 bg-background/70 px-6 backdrop-blur-sm shrink-0">
       <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-        <span>Synchro</span>
+        <span className="uppercase tracking-[0.2em] text-[11px] text-muted-foreground/80">
+          Synchro
+        </span>
         <ChevronRight className="h-4 w-4" />
         <div className="flex items-center gap-2 text-foreground">
-          <div className="flex items-center h-6 px-2 py-1 bg-muted rounded-md gap-1">
-            <span className="text-black/70">◫</span>
+          <div className="flex items-center h-7 px-3 py-1 bg-accent/70 rounded-full gap-1 text-sm">
+            <span className="text-foreground/70">◫</span>
             <span>
               {formattedPageName === 'Tasks' ? 'My Task' : formattedPageName}
             </span>
@@ -86,12 +88,12 @@ export function Navbar() {
       </div>
 
       <div className="flex items-center gap-4">
-        <div className="relative w-64">
+        <div className="relative w-72">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"
             placeholder="Search task..."
-            className="w-full bg-muted/30 pl-9 rounded-full h-9 border-none text-sm focus-visible:ring-1"
+            className="w-full bg-background/80 pl-9 rounded-full h-10 border border-border/70 text-sm focus-visible:ring-1"
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
             onKeyDown={(e) => {
@@ -104,15 +106,11 @@ export function Navbar() {
           />
         </div>
 
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-9 w-9 rounded-full bg-muted/50"
-        >
+        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full bg-muted/40">
           <Share2 className="h-4 w-4 text-muted-foreground" />
         </Button>
 
-        <div className="flex items-center gap-3 border-l pl-4 ml-2">
+        <div className="flex items-center gap-3 border-l border-border/70 pl-4 ml-2">
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground font-medium">
               3 min ago
@@ -146,7 +144,6 @@ export function Navbar() {
             <UserPlus className="h-4 w-4" />
             Invite
           </Button>
-
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -157,25 +154,21 @@ export function Navbar() {
                 <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="end" forceMount>
-              {user && (
-                <>
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">
-                        {user.name}
-                      </p>
-                      <p className="text-xs leading-none text-muted-foreground">
-                        {user.email}
-                      </p>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => logoutMutation.mutate()}>
-                    Log out
-                  </DropdownMenuItem>
-                </>
-              )}
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel className="font-normal">
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium leading-none">
+                    {user?.name}
+                  </p>
+                  <p className="text-xs leading-none text-muted-foreground">
+                    {user?.email}
+                  </p>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => logoutMutation.mutate()}>
+                Log out
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

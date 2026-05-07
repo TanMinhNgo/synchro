@@ -16,7 +16,7 @@ export function AiAgentChatPanel({
   chatViewportRef,
 }: AiAgentChatPanelProps) {
   return (
-    <div className="flex h-156 flex-col rounded-2xl border border-zinc-700/70 bg-zinc-950/60 p-2">
+    <div className="flex h-140 flex-col rounded-3xl border border-border/70 bg-background/80 p-3">
       <ScrollArea className="min-h-0 flex-1">
         <div ref={chatViewportRef} className="space-y-2 pr-2">
           {chatMessages.map((message) => (
@@ -27,8 +27,8 @@ export function AiAgentChatPanel({
               <div
                 className={`w-[70%] whitespace-pre-wrap wrap-break-words rounded-2xl px-3 py-2 text-sm leading-relaxed ${
                   message.role === 'user'
-                    ? 'rounded-br-md bg-amber-300 text-zinc-900'
-                    : 'rounded-bl-md bg-slate-700 text-slate-100'
+                    ? 'rounded-br-md bg-primary text-primary-foreground shadow-sm'
+                    : 'rounded-bl-md bg-muted/60 text-foreground'
                 }`}
               >
                 {message.text}
@@ -50,11 +50,11 @@ export function AiAgentChatPanel({
           }}
           disabled={sendDisabled}
           placeholder="Ask Synchro AI about your project, report, or assignees"
-          className="border-zinc-700 bg-zinc-900 text-zinc-100 placeholder:text-zinc-500"
+          className="border-border/70 bg-background/80 text-foreground placeholder:text-muted-foreground"
         />
         <Button
           size="icon"
-          className="shrink-0 bg-orange-500 text-zinc-950 hover:bg-orange-400"
+          className="shrink-0 bg-primary text-primary-foreground shadow-md shadow-primary/20 hover:bg-primary/90"
           onClick={onSend}
           disabled={sendDisabled}
           aria-label="Send message"

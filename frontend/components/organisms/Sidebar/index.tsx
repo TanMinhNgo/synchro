@@ -51,9 +51,9 @@ export function Sidebar() {
   );
 
   return (
-    <div className="flex h-full w-65 flex-col border-r bg-background shrink-0">
+    <div className="flex h-full w-72 flex-col border-r border-sidebar-border bg-sidebar/90 backdrop-blur-sm shrink-0">
       {/* User Profile */}
-      <div className="flex items-center justify-between p-4 pl-6 pt-6">
+      <div className="flex items-center justify-between p-5 pl-6 pt-6">
         <div className="flex items-center gap-3 w-40 overflow-hidden">
           <Avatar className="h-10 w-10 shrink-0">
             <AvatarImage
@@ -81,14 +81,14 @@ export function Sidebar() {
 
       {/* Create Task Button */}
       <div className="px-4 pb-4">
-        <Button className="w-full justify-center gap-2 rounded-xl" size="lg">
+        <Button className="w-full justify-center gap-2 rounded-full shadow-md shadow-primary/10" size="lg">
           <Plus className="h-5 w-5" />
           Create Task
         </Button>
       </div>
 
       {/* Main Navigation */}
-      <div className="flex-1 overflow-y-auto px-3 py-2 scrollbar-thin">
+      <div className="flex-1 overflow-y-auto px-3 py-3 scrollbar-thin">
         <nav className="space-y-0.5">
           {navigation.map((item) => {
             const isActive =
@@ -99,10 +99,10 @@ export function Sidebar() {
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  'flex items-center justify-between rounded-xl px-3 py-2.5 text-sm transition-colors font-medium',
+                  'flex items-center justify-between rounded-2xl px-3 py-2.5 text-sm transition-all font-medium',
                   isActive
-                    ? 'bg-secondary text-foreground'
-                    : 'text-muted-foreground hover:bg-secondary/50 hover:text-foreground',
+                    ? 'bg-accent text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:bg-accent/60 hover:text-foreground hover:translate-x-0.5',
                 )}
               >
                 <div className="flex items-center gap-3">
@@ -112,7 +112,7 @@ export function Sidebar() {
                 {count ? (
                   <Badge
                     variant="outline"
-                    className="h-5 rounded-md px-1.5 text-xs font-normal border-none bg-secondary text-muted-foreground"
+                    className="h-5 rounded-full px-2 text-xs font-normal border-none bg-background/70 text-muted-foreground"
                   >
                     {count}
                   </Badge>
@@ -148,7 +148,7 @@ export function Sidebar() {
               <Link
                 key={item.projectId}
                 href={item.href}
-                className="flex items-center gap-3 rounded-lg px-2 py-2 text-sm text-muted-foreground hover:bg-secondary/50 hover:text-foreground transition-colors font-medium"
+                className="flex items-center gap-3 rounded-xl px-2 py-2 text-sm text-muted-foreground hover:bg-accent/60 hover:text-foreground transition-colors font-medium"
               >
                 <ListMinus className="h-4 w-4 shrink-0" />
                 <span className="truncate">{item.name}</span>
@@ -162,7 +162,7 @@ export function Sidebar() {
       <div className="p-4 mt-auto">
         <Link
           href="/help"
-          className="flex items-center justify-between rounded-xl px-3 py-2 text-sm text-muted-foreground hover:bg-secondary/50 hover:text-foreground transition-colors font-medium"
+          className="flex items-center justify-between rounded-2xl px-3 py-2 text-sm text-muted-foreground hover:bg-accent/60 hover:text-foreground transition-colors font-medium"
         >
           Help Center
           <HelpCircle className="h-4 w-4" />
