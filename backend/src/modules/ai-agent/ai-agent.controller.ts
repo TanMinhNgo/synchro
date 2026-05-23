@@ -7,7 +7,6 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
   ApiBearerAuth,
   ApiOkResponse,
@@ -20,9 +19,7 @@ import { AnalyzeTaskReportDto } from '@/contracts/ai-agent/dto/analyze-task-repo
 import { AssignmentAdviceDto } from '@/contracts/ai-agent/dto/assignment-advice.dto';
 import { AssistantChatDto } from '@/contracts/ai-agent/dto/assistant-chat.dto';
 import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
-import { AI_TASK_REPORT_SUBMITTED_EVENT } from './ai-agent.events';
-import type { TaskReportSubmittedEvent } from './ai-agent.events';
-import { AiAgentService } from './ai-agent.service';
+import { AiAgentServiceClient } from './ai-agent-service.client';
 
 type HistoryVerdictFilter = 'needs_fix' | 'review_manually' | 'reasonable';
 
@@ -31,10 +28,7 @@ type HistoryVerdictFilter = 'needs_fix' | 'review_manually' | 'reasonable';
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 export class AiAgentController {
-  constructor(
-    private readonly ai: AiAgentService,
-    private readonly events: EventEmitter2,
-  ) {}
+  constructor(private readonly ai: AiAgentServiceClient) {}
 
   @Post('tasks/:taskId/submit-report')
   @ApiOperation({
@@ -47,21 +41,7 @@ export class AiAgentController {
     @Param('taskId') taskId: string,
     @Body() dto: AnalyzeTaskReportDto,
   ) {
-    const payload: TaskReportSubmittedEvent = {
-      actorUserId: user.sub,
-      taskId,
-      report: dto,
-    };
-
-    const responses = await this.events.emitAsync(
-      AI_TASK_REPORT_SUBMITTED_EVENT,
-      payload,
-    );
-
-    const first = responses.find((r) => Boolean(r));
-    if (first) return first;
-
-    return this.ai.analyzeTaskReport(user.sub, taskId, dto);
+    return this.ai.submitTaskReport(user.sub, taskId, dto);
   }
 
   @Post('tasks/:taskId/analyze-report')

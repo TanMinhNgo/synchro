@@ -5,7 +5,7 @@ import type { Model } from 'mongoose';
 import type { AnalyzeTaskReportDto } from '@/contracts/ai-agent/dto/analyze-task-report.dto';
 import type { AssignmentAdviceDto } from '@/contracts/ai-agent/dto/assignment-advice.dto';
 import type { AssistantChatDto } from '@/contracts/ai-agent/dto/assistant-chat.dto';
-import { NotificationProxyService } from '@/modules/notification/notification.proxy.service';
+import { NotificationServiceClient } from '@/modules/notification/notification-service.client';
 import { ProjectServiceClient } from '@/modules/project/project-service.client';
 import { TaskServiceClient } from '@/modules/task/task-service.client';
 import {
@@ -68,7 +68,7 @@ export class AiAgentService {
     private readonly historyModel: Model<TaskReportHistoryDocument>,
     private readonly tasks: TaskServiceClient,
     private readonly projects: ProjectServiceClient,
-    private readonly notifications: NotificationProxyService,
+    private readonly notifications: NotificationServiceClient,
   ) {}
 
   async analyzeTaskReport(
@@ -242,9 +242,7 @@ export class AiAgentService {
       ...(dto.progressPercent !== undefined
         ? { progressPercent: dto.progressPercent }
         : {}),
-      ...(dto.workedHours !== undefined
-        ? { workedHours: dto.workedHours }
-        : {}),
+      ...(dto.workedHours !== undefined ? { workedHours: dto.workedHours } : {}),
       ...(dto.blockers ? { blockers: dto.blockers } : {}),
       ...(dto.nextActions ? { nextActions: dto.nextActions } : {}),
       verdict: result.verdict,

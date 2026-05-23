@@ -52,6 +52,16 @@
         "deleteOutDir": true,
         "outputPath": "dist/notification-service"
       }
+    },
+    "ai-agent-service": {
+      "type": "application",
+      "root": "src/ai-agent-service",
+      "entryFile": "main",
+      "sourceRoot": "src",
+      "compilerOptions": {
+        "deleteOutDir": true,
+        "outputPath": "dist/ai-agent-service"
+      }
     }
   },
   "compilerOptions": {

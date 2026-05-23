@@ -1,26 +1,30 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { NotificationModule } from '@/modules/notification/notification.module';
-import { ProjectModule } from '@/modules/project/project.module';
-import { TaskModule } from '@/modules/task/task.module';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AiAgentController } from './ai-agent.controller';
-import { AiAgentListener } from './ai-agent.listener';
-import { AiAgentService } from './ai-agent.service';
-import {
-  TaskReportHistory,
-  TaskReportHistorySchema,
-} from './schemas/task-report-history.schema';
+import { AiAgentServiceClient } from './ai-agent-service.client';
+import { AI_AGENT_SERVICE_NATS_CLIENT } from './ai-agent-service.nats';
 
 @Module({
   imports: [
-    TaskModule,
-    ProjectModule,
-    NotificationModule,
-    MongooseModule.forFeature([
-      { name: TaskReportHistory.name, schema: TaskReportHistorySchema },
+    ConfigModule,
+    ClientsModule.registerAsync([
+      {
+        name: AI_AGENT_SERVICE_NATS_CLIENT,
+        inject: [ConfigService],
+        useFactory: (config: ConfigService) => ({
+          transport: Transport.NATS,
+          options: {
+            servers: [
+              config.get<string>('NATS_URL') ?? 'nats://localhost:4222',
+            ],
+          },
+        }),
+      },
     ]),
   ],
   controllers: [AiAgentController],
-  providers: [AiAgentService, AiAgentListener],
+  providers: [AiAgentServiceClient],
+  exports: [AiAgentServiceClient],
 })
 export class AiAgentModule {}
